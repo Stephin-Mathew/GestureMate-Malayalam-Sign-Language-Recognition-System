@@ -9,10 +9,17 @@ export default function VoiceTranslation() {
   const [isLoading, setIsLoading] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [transcript, setTranscript] = useState('');
+  const [interimTranscript, setInterimTranscript] = useState('');
   const [translation, setTranslation] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
   const router = useRouter();
-  const { isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
+
+  // VTT variables
+  let recognitionRef = null;
+  let isListeningRef = false;
 
   useEffect(() => {
     // Simulate loading
@@ -23,28 +30,142 @@ export default function VoiceTranslation() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (!isSignedIn) {
-    router.push('/login');
+  // Toast notification
+  const displayToast = (message, isError = false) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  // Initialize Speech Recognition
+  const initSpeechRecognition = () => {
+    if (!('webkitSpeechRecognition' in window)) {
+      displayToast('Browser does not support voice recognition. Use Chrome or Edge.', true);
+      return false;
+    }
+
+    const SpeechRecognition = window.webkitSpeechRecognition;
+    recognitionRef = new SpeechRecognition();
+
+    recognitionRef.lang = 'ml-IN'; // Malayalam
+    recognitionRef.continuous = true;
+    recognitionRef.interimResults = true;
+
+    recognitionRef.onstart = () => {
+      isListeningRef = true;
+      setIsRecording(true);
+      displayToast('Listening for Malayalam speech...');
+    };
+
+    recognitionRef.onend = () => {
+      isListeningRef = false;
+      setIsRecording(false);
+      setInterimTranscript('');
+    };
+
+    recognitionRef.onresult = (event) => {
+      let interimTrans = '';
+      let finalTrans = '';
+
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        const transcriptPart = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalTrans += transcriptPart;
+        } else {
+          interimTrans += transcriptPart;
+        }
+      }
+
+      if (finalTrans) {
+        setTranscript((prev) => {
+          const newText = prev + (prev && !prev.endsWith(' ') ? ' ' : '') + finalTrans;
+          // Simple emoji translation for demo
+          generateSimpleTranslation(newText);
+          return newText;
+        });
+      }
+
+      setInterimTranscript(interimTrans);
+    };
+
+    recognitionRef.onerror = (event) => {
+      console.error('Speech recognition error', event.error);
+      if (event.error === 'no-speech') return;
+
+      let errorMsg =
+        event.error === 'not-allowed'
+          ? 'Microphone access denied. Please allow permission.'
+          : `Voice Recognition Error: ${event.error}`;
+
+      displayToast(errorMsg, true);
+      stopRecording();
+    };
+
+    return true;
+  };
+
+  // Simple translation generator (emoji-based for demo)
+  const generateSimpleTranslation = (text) => {
+    const lowerText = text.toLowerCase();
+    
+    let emoji = '👋';
+    
+    if (lowerText.includes('hello') || lowerText.includes('hi')) emoji = '👋';
+    if (lowerText.includes('how') || lowerText.includes('you')) emoji = '👏';
+    if (lowerText.includes('thank')) emoji = '🙏';
+    if (lowerText.includes('yes')) emoji = '✋';
+    if (lowerText.includes('no')) emoji = '🤷';
+    if (lowerText.includes('help')) emoji = '🤝';
+    if (lowerText.includes('good')) emoji = '👍';
+    if (lowerText.includes('bad')) emoji = '👎';
+
+    setTranslation(`${emoji} ${text}`);
+  };
+
+  const startRecording = () => {
+    if (!recognitionRef && !initSpeechRecognition()) return;
+
+    try {
+      setTranscript('');
+      setTranslation('');
+      setInterimTranscript('');
+      recognitionRef.start();
+    } catch (error) {
+      console.error('Failed to start recording', error);
+      displayToast('Failed to start recording', true);
+    }
+  };
+
+  const stopRecording = () => {
+    if (recognitionRef) {
+      try {
+        recognitionRef.stop();
+      } catch (error) {
+        console.error('Failed to stop recording', error);
+      }
+    }
+    setIsRecording(false);
+    displayToast('Recording stopped');
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoaded || isLoading) return;
+    if (!isSignedIn) {
+      router.push('/login');
+    }
+  }, [isLoaded, isSignedIn, isLoading, router]);
+
+  if (!isLoaded || !isSignedIn) {
     return <Loading />;
   }
-
-  const handleStartRecording = () => {
-    setIsRecording(true);
-    setTranscript('Listening...');
-    // Simulate voice recognition
-    setTimeout(() => {
-      setTranscript('Hello, how are you today?');
-      setTimeout(() => {
-        setTranslation('👋 Hello, how are you today?');
-        setIsRecording(false);
-      }, 1000);
-    }, 2000);
-  };
-
-  const handleStopRecording = () => {
-    setIsRecording(false);
-    setTranscript('Processing...');
-  };
 
   if (isLoading) {
     return <Loading />;
@@ -78,7 +199,7 @@ export default function VoiceTranslation() {
             {/* Recording Button */}
             <div className="flex justify-center mb-8">
               <button
-                onClick={isRecording ? handleStopRecording : handleStartRecording}
+                onClick={toggleRecording}
                 className={`w-24 h-24 rounded-full flex items-center justify-center text-white font-semibold transition-all duration-300 ${
                   isRecording
                     ? 'bg-red-500 animate-pulse shadow-red-200'
@@ -98,6 +219,15 @@ export default function VoiceTranslation() {
                 )}
               </button>
             </div>
+
+            {/* Interim Transcript */}
+            {interimTranscript && (
+              <div className="bg-blue-50 rounded-xl p-4 mb-4 border border-blue-200">
+                <p className="text-gray-500 italic text-sm" style={{ fontFamily: 'var(--font-inter)' }}>
+                  {interimTranscript}
+                </p>
+              </div>
+            )}
 
             {/* Transcript Display */}
             <div className="bg-gray-50 rounded-xl p-6 mb-6">
@@ -188,6 +318,15 @@ export default function VoiceTranslation() {
 
       {/* Footer */}
       <Footer />
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className={`fixed bottom-8 right-8 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 ${
+          toastMessage.includes('Error') || toastMessage.includes('error') ? 'bg-red-500' : 'bg-gray-800'
+        } text-white text-sm font-medium`}>
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 }

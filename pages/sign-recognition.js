@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth, useUser } from '@clerk/nextjs';
 import Head from 'next/head';
@@ -12,9 +12,14 @@ export default function SignRecognition() {
   const [sentence, setSentence] = useState('');
   const [confidence, setConfidence] = useState(0.0);
   const [isConnected, setIsConnected] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastIsError, setToastIsError] = useState(false);
   const router = useRouter();
-  const { isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
+  const currentAudioRef = useRef(null);
 
   // Use Next.js API proxy for video feed to avoid CORS issues
   // If Flask has CORS configured, you can use: const flaskUrl = process.env.NEXT_PUBLIC_FLASK_BACKEND_URL || 'http://localhost:5000';
@@ -31,7 +36,7 @@ export default function SignRecognition() {
 
   // Update status from Flask backend
   useEffect(() => {
-    if (!isSignedIn || isLoading) return;
+    if (!isLoaded || !isSignedIn || isLoading) return;
 
     const updateStatus = async () => {
       try {
@@ -56,18 +61,144 @@ export default function SignRecognition() {
     updateStatus(); // Initial fetch
 
     return () => clearInterval(interval);
-  }, [isSignedIn, isLoading]);
+  }, [isLoaded, isSignedIn, isLoading]);
 
-  if (!isSignedIn) {
-    router.push('/login');
+  useEffect(() => {
+    if (!isLoaded || isLoading) return;
+    if (!isSignedIn) {
+      router.push('/login');
+    }
+  }, [isLoaded, isSignedIn, isLoading, router]);
+
+  if (!isLoaded || !isSignedIn) {
     return <Loading />;
   }
 
   const handleReset = () => {
+    stopAudio();
     setSentence('');
     setChar('—');
     setConfidence(0.0);
   };
+
+  // WAV Blob converter for TTS
+  const createWavBlob = (base64Data, sampleRate = 24000, numChannels = 1) => {
+    const raw = atob(base64Data);
+    const rawLength = raw.length;
+    const array = new Uint8Array(new ArrayBuffer(rawLength));
+    for (let i = 0; i < rawLength; i++) {
+      array[i] = raw.charCodeAt(i);
+    }
+
+    const header = new ArrayBuffer(44);
+    const view = new DataView(header);
+    const bitsPerSample = 16;
+    const blockAlign = numChannels * bitsPerSample / 8;
+    const byteRate = sampleRate * blockAlign;
+    const dataSize = rawLength;
+    const fileSize = 36 + dataSize;
+    
+    view.setUint32(0, 0x46464952, true); // 'RIFF'
+    view.setUint32(4, fileSize, true);
+    view.setUint32(8, 0x45564157, true); // 'WAVE'
+    view.setUint32(12, 0x20746d66, true); // 'fmt '
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM format
+    view.setUint16(22, numChannels, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, byteRate, true);
+    view.setUint16(32, blockAlign, true);
+    view.setUint16(34, bitsPerSample, true);
+    view.setUint32(36, 0x61746164, true); // 'data'
+    view.setUint32(40, dataSize, true);
+
+    return new Blob([view, array], { type: 'audio/wav' });
+  };
+
+  // Toast notification
+  const displayToast = (message, isError = false) => {
+    setToastMessage(message);
+    setToastIsError(isError);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  // Speak sentence using Gemini TTS
+  const speakSentence = async () => {
+    if (!sentence.trim()) {
+      displayToast('No sentence to speak!', true);
+      return;
+    }
+
+    if (isSpeaking) {
+      stopAudio();
+      return;
+    }
+
+    setIsSpeaking(true);
+    displayToast('Converting text to speech...');
+
+    try {
+      const response = await fetch('/api/gemini-tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: sentence, voiceName: 'Kore' }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Error: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      const audioBase64 = data?.audio?.data;
+      const sampleRate = data?.audio?.sampleRate ?? 24000;
+      const channels = data?.audio?.channels ?? 1;
+
+      if (audioBase64) {
+        const wavBlob = createWavBlob(audioBase64, sampleRate, channels);
+        const audioUrl = URL.createObjectURL(wavBlob);
+        const audio = new Audio(audioUrl);
+        stopAudio();
+        currentAudioRef.current = audio;
+
+        audio.onended = () => {
+          setIsSpeaking(false);
+          URL.revokeObjectURL(audioUrl);
+          displayToast('Playback completed');
+        };
+
+        await audio.play();
+        displayToast('Playing Malayalam audio');
+      } else {
+        throw new Error('No audio in response');
+      }
+    } catch (error) {
+      console.error('TTS Error:', error);
+      displayToast(`Audio Error: ${error.message}`, true);
+      setIsSpeaking(false);
+    }
+  };
+
+  const stopAudio = () => {
+    const audio = currentAudioRef.current;
+    if (audio) {
+      try {
+        audio.pause();
+        audio.currentTime = 0;
+      } finally {
+        if (typeof audio.src === 'string' && audio.src.startsWith('blob:')) {
+          URL.revokeObjectURL(audio.src);
+        }
+        currentAudioRef.current = null;
+      }
+    }
+    setIsSpeaking(false);
+  };
+
+  useEffect(() => {
+    return () => stopAudio();
+  }, []);
 
   if (isLoading) {
     return <Loading />;
@@ -140,10 +271,30 @@ export default function SignRecognition() {
             >
               Reset Sentence
             </button>
+
+            <button
+              onClick={speakSentence}
+              className={`mt-3 w-full text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 ${
+                isSpeaking ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-600 hover:bg-emerald-700'
+              }`}
+              style={{ fontFamily: 'var(--font-glory)' }}
+            >
+              <span>{isSpeaking ? '■' : '▶'}</span>
+              {isSpeaking ? 'Stop Audio' : 'Speak Sentence (TTS)'}
+            </button>
           </div>
         </div>
       </main>
       <Footer />
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className={`fixed bottom-8 right-8 px-6 py-3 rounded-lg shadow-lg transition-all duration-300 ${
+          toastIsError ? 'bg-red-500' : 'bg-gray-800'
+        } text-white text-sm font-medium`}>
+          {toastMessage}
+        </div>
+      )}
     </div>
   );
 }

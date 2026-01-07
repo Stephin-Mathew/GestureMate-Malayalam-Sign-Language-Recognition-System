@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Malayalam Gemini Voice Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Pulse animation for the listening state (VTT) */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.8); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .listening-animation { animation: pulse-ring 2s infinite; }
+        
+        /* Custom scrollbar */
+        textarea::-webkit-scrollbar { width: 8px; }
+        textarea::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 4px; }
+        textarea::-webkit-scrollbar-thumb:hover { background: #34d399; }
+
+        /* Custom styling for the range input (Disabled since API doesn't support them) */
+        input[type='range'] { opacity: 0.5; pointer-events: none; }
+        input[type='range']::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 16px; height: 16px; border-radius: 50%;
+            background: #0d9488; cursor: pointer; box-shadow: 0 0 0 2px #fff;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-teal-50 to-emerald-100 min-h-screen flex flex-col items-center p-4 sm:p-8 font-sans">
+
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[90vh]">
+        
+        <div class="bg-teal-600 p-6 text-white text-center relative">
+            <h1 class="text-2xl font-bold mb-1">🇲🇱 Malayalam Gemini Voice Assistant</h1>
+            <p class="text-teal-200 text-sm">VTT (Browser) & High-Quality TTS (Gemini API)</p>
+            
+            <div id="statusBadge" class="absolute top-6 right-6 px-3 py-1 rounded-full text-xs font-semibold bg-teal-800 text-teal-300 transition-colors duration-300">
+                Ready
+            </div>
+        </div>
+        
+        <div class="bg-red-100 p-2 text-center text-sm font-semibold text-red-700">
+            WARNING: API Key is hardcoded for testing. Use only for development.
+        </div>
+
+        <div class="flex-1 p-6 relative flex flex-col border-b border-gray-100">
+            <div class="flex justify-between items-center mb-2">
+                <label class="text-xs font-bold text-gray-400 uppercase tracking-wider">Transcript / Input Text</label>
+                <span id="charCount" class="text-xs text-gray-400">0 characters</span>
+            </div>
+            
+            <div class="relative flex-1">
+                <textarea id="transcript" 
+                    class="w-full h-full p-4 text-lg text-gray-800 bg-gray-50 rounded-lg border border-gray-200 focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none resize-none leading-relaxed transition-all"
+                    placeholder="സംസാരിച്ചു തുടങ്ങുക അല്ലെങ്കിൽ ടൈപ്പ് ചെയ്യുക..." 
+                    lang="ml"></textarea>
+                
+                <div id="interim" class="absolute bottom-4 left-4 right-4 text-gray-400 text-lg pointer-events-none truncate italic"></div>
+            </div>
+        </div>
+        
+        <div class="p-6 bg-gray-50 border-t border-gray-100 grid grid-cols-3 gap-4 items-center">
+            
+            <div class="flex flex-col items-center justify-center space-y-2">
+                <div class="relative">
+                    <button id="micButton" class="w-16 h-16 rounded-full bg-white shadow-xl border border-gray-200 flex items-center justify-center text-gray-500 transition-all duration-300 hover:shadow-md focus:outline-none z-10 relative">
+                        <i class="fas fa-microphone text-2xl"></i>
+                    </button>
+                    <div id="pulseRing" class="absolute inset-0 rounded-full bg-teal-500 opacity-0 -z-0"></div>
+                </div>
+                <p id="instructionText" class="text-gray-500 text-xs font-medium text-center">Tap to Speak (VTT)</p>
+            </div>
+
+            <div class="col-span-2 space-y-2">
+                
+                <div class="flex space-x-4">
+                    <div class="w-1/2">
+                        <label for="rate" class="block text-xs font-medium text-gray-600">Rate: <span id="rateValue">1.0</span></label>
+                        <input type="range" id="rate" min="0.5" max="2" value="1" step="0.1" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                    <div class="w-1/2">
+                        <label for="pitch" class="block text-xs font-medium text-gray-600">Pitch: <span id="pitchValue">1.0</span></label>
+                        <input type="range" id="pitch" min="0" max="2" value="1" step="0.1" class="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+                
+                <div>
+                    <select id="voiceSelect" class="w-full p-2 border border-gray-300 rounded-lg text-sm bg-gray-200" disabled>
+                        <option value="gemini-tts">High Quality Gemini TTS (Voice: Kore)</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="speakButton" onclick="speakGeminiText()" class="flex items-center justify-center space-x-1 py-2 px-3 bg-amber-600 rounded-lg text-white text-sm font-semibold hover:bg-amber-700 active:bg-amber-800 transition-colors shadow-md">
+                        <i class="fas fa-gem"></i>
+                        <span>Speak (Gemini TTS)</span>
+                    </button>
+                    <button id="stopButton" onclick="stopAudio()" class="flex items-center justify-center space-x-1 py-2 px-3 bg-white border border-gray-300 rounded-lg text-red-600 text-sm font-medium hover:bg-red-50 active:bg-red-100 transition-colors shadow-sm" disabled>
+                        <i class="fas fa-stop-circle"></i>
+                        <span>Stop Audio</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-6 bg-gray-50 border-t border-gray-100 grid grid-cols-2 gap-4">
+            <button onclick="copyText()" class="flex items-center justify-center space-x-2 py-3 px-4 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 active:bg-gray-100 transition-colors shadow-sm">
+                <i class="fas fa-copy"></i>
+                <span>Copy Text</span>
+            </button>
+            <button onclick="clearText()" class="flex items-center justify-center space-x-2 py-3 px-4 bg-white border border-gray-300 rounded-lg text-red-600 font-medium hover:bg-red-50 active:bg-red-100 transition-colors shadow-sm">
+                <i class="fas fa-trash-alt"></i>
+                <span>Clear All</span>
+            </button>
+        </div>
+
+    </div>
+
+    <div id="toast" class="fixed bottom-8 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        Notification message
+    </div>
+
+    <script>
+        // --- Shared Variables ---
+        const transcriptArea = document.getElementById('transcript');
+        const statusBadge = document.getElementById('statusBadge');
+        const toast = document.getElementById('toast');
+        const charCount = document.getElementById('charCount');
+        const rateInput = document.getElementById('rate');
+        const pitchInput = document.getElementById('pitch');
+        const rateValue = document.getElementById('rateValue');
+        const pitchValue = document.getElementById('pitchValue');
+
+        // --- VTT (Voice-to-Text) Variables ---
+        const micButton = document.getElementById('micButton');
+        const pulseRing = document.getElementById('pulseRing');
+        const instructionText = document.getElementById('instructionText');
+        const interimDisplay = document.getElementById('interim');
+        let recognition = null;
+        let isListening = false;
+
+        // --- Gemini TTS Variables ---
+        // 🚨 YOUR API KEY HARDCODED HERE FOR TESTING 🚨
+        const API_KEY = "AIzaSyC_10woPW9bxRtxlpo3OptktT3BHakZAyA"; 
+        const geminiSpeakButton = document.getElementById('speakButton');
+        const geminiStopButton = document.getElementById('stopButton');
+        let currentAudio = null; // To hold the HTML5 Audio element
+
+
+        // ======================================================
+        // I. VTT (Voice-to-Text) Logic
+        // ======================================================
+
+        function initSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window)) {
+                showToast("VTT: Browser does not support Recognition. Use Chrome/Edge.", true);
+                micButton.disabled = true;
+                return false;
+            }
+
+            const SpeechRecognition = window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+
+            recognition.lang = 'ml-IN'; // Set to Malayalam
+            recognition.continuous = true; 
+            recognition.interimResults = true; 
+
+            recognition.onstart = () => {
+                isListening = true;
+                updateVTT_UIState(true);
+                stopAudio(); // Stop TTS if VTT starts
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                updateVTT_UIState(false);
+                interimDisplay.innerText = ''; 
+            };
+
+            recognition.onresult = (event) => {
+                let interimTranscript = '';
+                let newFinal = '';
+
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        newFinal += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+
+                if (newFinal) {
+                    const currentText = transcriptArea.value;
+                    const separator = (currentText && !currentText.endsWith(' ') && !currentText.endsWith('\n')) ? ' ' : '';
+                    transcriptArea.value = currentText + separator + newFinal;
+                    transcriptArea.dispatchEvent(new Event('input'));
+                    transcriptArea.scrollTop = transcriptArea.scrollHeight;
+                }
+
+                interimDisplay.innerText = interimTranscript;
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech recognition error", event.error);
+                if (event.error === 'no-speech') return; 
+                
+                let msg = (event.error === 'not-allowed') ? "Mic access denied. Allow permission." : `VTT Error: ${event.error}`;
+                showToast(msg, true);
+                stopListening();
+            };
+
+            return true;
+        }
+
+        function updateVTT_UIState(listening) {
+            if (listening) {
+                micButton.classList.remove('bg-white', 'text-gray-500', 'border-gray-200');
+                micButton.classList.add('bg-teal-500', 'text-white', 'border-teal-500');
+                pulseRing.classList.add('listening-animation');
+                pulseRing.classList.remove('opacity-0');
+                
+                instructionText.innerText = "Listening... Speak now";
+                instructionText.classList.add('text-teal-600');
+                
+                statusBadge.innerText = "LISTENING";
+                statusBadge.classList.remove('bg-teal-800', 'text-teal-300', 'bg-amber-600');
+                statusBadge.classList.add('bg-teal-100', 'text-teal-600');
+            } else {
+                micButton.classList.add('bg-white', 'text-gray-500', 'border-gray-200');
+                micButton.classList.remove('bg-teal-500', 'text-white', 'border-teal-500');
+                pulseRing.classList.remove('listening-animation');
+                pulseRing.classList.add('opacity-0');
+                
+                instructionText.innerText = "Tap to Speak (VTT)";
+                instructionText.classList.remove('text-teal-600');
+
+                updateStatusBadge("Ready");
+            }
+        }
+
+        function toggleListening() {
+            if (!recognition && !initSpeechRecognition()) return;
+
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        }
+
+        function startListening() {
+            try {
+                recognition.start();
+                showToast("Voice Recognition Started (ml-IN)");
+            } catch (e) {
+                console.error("Failed to start recognition", e);
+            }
+        }
+
+        function stopListening() {
+            try {
+                recognition.stop();
+                showToast("Voice Recognition Stopped");
+            } catch (e) {
+                console.error("Failed to stop recognition", e);
+            }
+        }
+
+
+        // ======================================================
+        // II. GEMINI TTS Logic
+        // ======================================================
+        
+        // Converts raw L16 PCM audio from the Gemini API into a playable WAV file format.
+        function createWavBlob(base64Data, sampleRate, numChannels) {
+            const raw = atob(base64Data);
+            const rawLength = raw.length;
+            const array = new Uint8Array(new ArrayBuffer(rawLength));
+            for (let i = 0; i < rawLength; i++) {
+                array[i] = raw.charCodeAt(i);
+            }
+
+            const header = new ArrayBuffer(44);
+            const view = new DataView(header);
+            const bitsPerSample = 16;
+            const blockAlign = numChannels * bitsPerSample / 8;
+            const byteRate = sampleRate * blockAlign;
+            const dataSize = rawLength;
+            const fileSize = 36 + dataSize;
+            
+            // RIFF chunk
+            view.setUint32(0, 0x46464952, true); // 'RIFF'
+            view.setUint32(4, fileSize, true);
+            view.setUint32(8, 0x45564157, true); // 'WAVE'
+            
+            // FMT chunk
+            view.setUint32(12, 0x20746d66, true); // 'fmt '
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true); // PCM format
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, bitsPerSample, true);
+            
+            // Data chunk
+            view.setUint32(36, 0x61746164, true); // 'data'
+            view.setUint32(40, dataSize, true);
+
+            const combined = new Blob([view, array], { type: 'audio/wav' });
+            return combined;
+        }
+
+
+        function speakGeminiText() {
+            if (isListening) stopListening();
+            
+            const text = transcriptArea.value.trim();
+            
+            if (!text) {
+                showToast("Please enter or record text to speak.");
+                return;
+            }
+            if (!API_KEY) {
+                showToast("API Key is missing from the script.", true);
+                return;
+            }
+            
+            geminiSpeakButton.disabled = true;
+            geminiStopButton.disabled = false;
+            showToast("Requesting high-quality Malayalam audio from Gemini...", false);
+
+            const MODEL_ID = "gemini-2.5-flash-preview-tts"; 
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_ID}:generateContent`;
+
+            const VOICE_NAME = 'Kore'; 
+            
+            const requestBody = {
+                contents: [{ 
+                    role: "user", 
+                    parts: [{ text: `Read the following Malayalam text: "${text}"` }] 
+                }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        // FIX: Changed from multiSpeakerVoiceConfig (which requires 2 speakers)
+                        // to the simpler voiceConfig for single-speaker synthesis.
+                        voiceConfig: { 
+                            prebuiltVoiceConfig: {
+                                voiceName: VOICE_NAME
+                            }
+                        }
+                    }
+                }
+            };
+            
+            // Update UI for API call
+            statusBadge.innerText = "GEMINI CALLING";
+            statusBadge.classList.remove('bg-teal-800', 'text-teal-300', 'bg-teal-100', 'text-teal-600');
+            statusBadge.classList.add('bg-amber-600', 'text-white');
+
+            fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-goog-api-key': API_KEY
+                },
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => { throw new Error(`API Error! Status: ${response.status} - ${text}`); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                const audioPart = data.candidates?.[0]?.content?.parts?.[0]?.inlineData;
+
+                if (audioPart && audioPart.data) {
+                    const base64L16Data = audioPart.data;
+                    
+                    const SAMPLE_RATE = 24000;
+                    const CHANNELS = 1;
+                    const wavBlob = createWavBlob(base64L16Data, SAMPLE_RATE, CHANNELS); 
+                    
+                    stopAudio(); 
+                    
+                    const audioUrl = URL.createObjectURL(wavBlob);
+                    const audio = new Audio(audioUrl);
+                    currentAudio = audio;
+
+                    audio.onended = () => {
+                        geminiSpeakButton.disabled = false;
+                        geminiStopButton.disabled = true;
+                        updateStatusBadge("Ready");
+                        URL.revokeObjectURL(audioUrl); 
+                    };
+
+                    audio.play();
+                    showToast("Playback started! (Gemini TTS)");
+                } else {
+                    throw new Error("API response missing audio content. Check if the model is correctly responding.");
+                }
+            })
+            .catch(error => {
+                console.error('GEMINI TTS API Error:', error);
+                showToast(`GEMINI API Error: Failed to generate audio. ${error.message}`, true);
+                geminiSpeakButton.disabled = false;
+                geminiStopButton.disabled = true;
+                updateStatusBadge("Error");
+            });
+        }
+
+        function stopAudio() {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+                URL.revokeObjectURL(currentAudio.src);
+                currentAudio = null;
+            }
+            geminiSpeakButton.disabled = false;
+            geminiStopButton.disabled = true;
+            updateStatusBadge("Ready");
+        }
+
+
+        // ======================================================
+        // III. Utility & Event Listeners
+        // ======================================================
+
+        function updateStatusBadge(text) {
+            statusBadge.innerText = text;
+            statusBadge.classList.remove('bg-amber-600', 'text-white', 'bg-teal-100', 'text-teal-600');
+            if (text === "Error") {
+                 statusBadge.classList.add('bg-red-600', 'text-white');
+            } else {
+                 statusBadge.classList.add('bg-teal-800', 'text-teal-300');
+            }
+        }
+
+        function copyText() {
+            const text = transcriptArea.value;
+            if (!text) {
+                showToast("Nothing to copy!");
+                return;
+            }
+            
+            if (navigator.clipboard && window.isSecureContext) {
+                 navigator.clipboard.writeText(text).then(() => {
+                    showToast("Text copied to clipboard!");
+                 });
+            } else {
+                transcriptArea.select();
+                document.execCommand('copy');
+                window.getSelection().removeAllRanges();
+                showToast("Text copied to clipboard!");
+            }
+        }
+
+        function clearText() {
+            transcriptArea.value = '';
+            transcriptArea.dispatchEvent(new Event('input'));
+            stopListening();
+            stopAudio();
+            showToast("Transcript cleared");
+        }
+
+        function showToast(message, isError = false) {
+            toast.innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0', 'bg-red-600', 'bg-gray-800');
+            
+            if (isError) {
+                toast.classList.add('bg-red-600');
+            } else {
+                toast.classList.add('bg-gray-800');
+            }
+            
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // --- Event Handlers ---
+        micButton.addEventListener('click', toggleListening);
+        
+        // Note: Rate/Pitch sliders are technically non-functional for the Gemini API call but remain for potential future support.
+        rateInput.addEventListener('input', () => { rateValue.innerText = rateInput.value; });
+        pitchInput.addEventListener('input', () => { pitchValue.innerText = pitchInput.value; });
+
+        // Character Counter
+        transcriptArea.addEventListener('input', function() {
+            const count = this.value.length;
+            charCount.innerText = count + " characters";
+        });
+
+        // Initialize VTT support check on load
+        window.addEventListener('DOMContentLoaded', () => {
+             if (!('webkitSpeechRecognition' in window)) {
+                instructionText.innerText = "VTT NOT SUPPORTED";
+                micButton.disabled = true;
+                micButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+            transcriptArea.dispatchEvent(new Event('input'));
+        });
+        
+    </script>
+</body>
+</html>
