@@ -11,7 +11,6 @@ const Navigation = () => {
     { name: 'Sign Recognition', href: '/sign-recognition', active: router.pathname === '/sign-recognition' },
     { name: 'Custom Training', href: '/custom-training', active: router.pathname === '/custom-training' },
     { name: 'Learning', href: '/learning', active: router.pathname === '/learning' },
-    { name: 'Voice Translation', href: '/voice-translation', active: router.pathname === '/voice-translation' },
   ];
 
   return (
@@ -27,11 +26,10 @@ const Navigation = () => {
           <Link
             key={item.name}
             href={item.href}
-            className={`text-base font-medium transition-colors ${
-              item.active
+            className={`text-base font-medium transition-colors ${item.active
                 ? 'text-brand-orange'
                 : 'text-brand-dark hover:text-brand-orange'
-            }`}
+              }`}
           >
             {item.name}
           </Link>

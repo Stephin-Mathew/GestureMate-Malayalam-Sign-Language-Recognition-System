@@ -36,7 +36,8 @@ export default function Home() {
         router.push('/sign-recognition');
         break;
       case 'voice-translation':
-        router.push('/voice-translation');
+        // Voice translation is now a tab inside sign-recognition
+        router.push('/sign-recognition?mode=voice');
         break;
       default:
         break;
@@ -95,7 +96,7 @@ export default function Home() {
             />
             <FeatureCard
               title="Voice Translation"
-              description="Convert spoken language to sign language gestures using advanced voice recognition technology"
+              description="Speak Malayalam and convert it to text using advanced voice recognition, then play it back with TTS"
               imageSrc="/images/voice-translation-icon.svg"
               onClick={() => handleFeatureClick('voice-translation')}
             />

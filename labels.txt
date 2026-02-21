@@ -41,5 +41,7 @@ sign_40,ഴ
 sign_41,റ
 sign_42,ർ
 sign_43,ൾ
+sign_44,ാ
+sign_45,്
 z_next,NEXT
 z_space,SPACE

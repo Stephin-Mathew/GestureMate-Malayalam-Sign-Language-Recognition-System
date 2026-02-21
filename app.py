@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, jsonify
+from flask import Flask, render_template, Response, jsonify, request
 import cv2
 import traceback
 import sys
@@ -138,24 +138,43 @@ def reset():
     latest_state["sentence"] = ""
     latest_state["char"] = "—"
     latest_state["confidence"] = 0.0
-    
-    # Reset engine state if initialized
+
     if engine is not None:
         engine.current_sentence = ""
         engine.best_char = None
         engine.best_confidence = 0.0
         engine.prediction_buffer.clear()
-    
+
     return jsonify({"status": "reset", "state": latest_state})
+
+@app.route("/patch-sentence", methods=["POST"])
+def patch_sentence():
+    """Overwrite the current sentence (e.g. after a backspace from the frontend)"""
+    global engine
+    data = request.get_json(silent=True) or {}
+    new_sentence = data.get("sentence", "")
+
+    latest_state["sentence"] = new_sentence
+    latest_state["char"] = "—"
+    latest_state["confidence"] = 0.0
+
+    if engine is not None:
+        engine.current_sentence = new_sentence
+        engine.best_char = None
+        engine.best_confidence = 0.0
+        engine.prediction_buffer.clear()
+
+    return jsonify({"status": "patched", "state": latest_state})
 
 @app.route("/health")
 def health():
     """Health check endpoint"""
     return jsonify({
-        "status": "ok", 
+        "status": "ok",
         "engine_initialized": engine is not None,
         "latest_state": latest_state
     })
+
 
 if __name__ == "__main__":
     print("=" * 50)

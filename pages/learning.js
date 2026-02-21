@@ -8,7 +8,7 @@ import Loading from '../components/Loading';
 export default function Learning() {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const { isSignedIn } = useAuth();
+  const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
 
   useEffect(() => {
@@ -18,8 +18,14 @@ export default function Learning() {
     return () => clearTimeout(timer);
   }, []);
 
-  if (!isSignedIn) {
-    router.push('/login');
+  useEffect(() => {
+    if (!isLoaded || isLoading) return;
+    if (!isSignedIn) {
+      router.push('/login');
+    }
+  }, [isLoaded, isSignedIn, isLoading, router]);
+
+  if (!isLoaded || !isSignedIn) {
     return <Loading />;
   }
 

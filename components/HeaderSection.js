@@ -1,7 +1,8 @@
+import { useUser } from '@clerk/nextjs';
+
 const HeaderSection = () => {
-  // Get user name from localStorage
-  const userName = typeof window !== 'undefined' ? localStorage.getItem('userName') : null;
-  const displayName = userName || 'Etren';
+  const { user } = useUser();
+  const displayName = user?.firstName || user?.fullName || user?.username || 'User';
 
   return (
     <div className="bg-white rounded-3xl p-8 mx-8 mt-24 relative overflow-hidden">
