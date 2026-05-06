@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@clerk/nextjs';
 import Navigation from '../components/Navigation';
 import HeaderSection from '../components/HeaderSection';
-import StatsCard from '../components/StatsCard';
+
 import FeatureCard from '../components/FeatureCard';
 import Footer from '../components/Footer';
 import Loading from '../components/Loading';
@@ -36,7 +36,8 @@ export default function Home() {
         router.push('/sign-recognition');
         break;
       case 'voice-translation':
-        router.push('/voice-translation');
+        // Voice translation is now a tab inside sign-recognition
+        router.push('/sign-recognition?mode=voice');
         break;
       default:
         break;
@@ -59,19 +60,9 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="w-full max-w-[1440px] mx-auto">
-        {/* Header Section and Stats Card Row */}
+        {/* Header Section */}
         <div className="relative px-8 pt-6">
-          <div className="flex gap-4 items-start">
-            {/* Header Section */}
-            <div className="flex-1">
-              <HeaderSection />
-            </div>
-
-            {/* Stats Card */}
-            <div className="mt-24">
-              <StatsCard />
-            </div>
-          </div>
+          <HeaderSection />
         </div>
 
         {/* Feature Cards Grid */}
@@ -95,7 +86,7 @@ export default function Home() {
             />
             <FeatureCard
               title="Voice Translation"
-              description="Convert spoken language to sign language gestures using advanced voice recognition technology"
+              description="Speak Malayalam and convert it to text using advanced voice recognition, then play it back with TTS"
               imageSrc="/images/voice-translation-icon.svg"
               onClick={() => handleFeatureClick('voice-translation')}
             />

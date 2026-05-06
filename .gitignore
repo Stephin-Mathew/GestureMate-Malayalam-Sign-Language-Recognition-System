@@ -10,6 +10,7 @@ __pycache__/
 # Environment
 .env
 .env.local
+gen-lang-client-0749893296-0e57b1d50841.json
 
 # ML outputs (optional if large)
 models/

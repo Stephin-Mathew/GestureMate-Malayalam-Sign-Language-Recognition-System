@@ -1,7 +1,8 @@
+import { useUser } from '@clerk/nextjs';
+
 const HeaderSection = () => {
-  // Get user name from localStorage
-  const userName = typeof window !== 'undefined' ? localStorage.getItem('userName') : null;
-  const displayName = userName || 'Etren';
+  const { user } = useUser();
+  const displayName = user?.firstName || user?.fullName || user?.username || 'User';
 
   return (
     <div className="bg-white rounded-3xl p-8 mx-8 mt-24 relative overflow-hidden">
@@ -11,7 +12,7 @@ const HeaderSection = () => {
       {/* Notification Icon */}
       <div className="absolute top-[54px] right-[163px] w-11 h-12 bg-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-gray-50 transition-colors">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C10.896 2 10 2.896 10 4V5.586L8.707 6.879C8.317 7.269 8.317 7.902 8.707 8.293L10 9.586V20H14V9.586L15.293 8.293C15.683 7.902 15.683 7.269 15.293 6.879L14 5.586V4C14 2.896 13.104 2 12 2Z" fill="#F97316"/>
+          <path d="M12 2C10.896 2 10 2.896 10 4V5.586L8.707 6.879C8.317 7.269 8.317 7.902 8.707 8.293L10 9.586V20H14V9.586L15.293 8.293C15.683 7.902 15.683 7.269 15.293 6.879L14 5.586V4C14 2.896 13.104 2 12 2Z" fill="#F97316" />
         </svg>
       </div>
 
@@ -47,10 +48,10 @@ const HeaderSection = () => {
           Hello, {displayName}
         </h1>
 
-        {/* Quote */}
-        <div className="text-2xl font-bold text-brand-dark" style={{ fontFamily: 'var(--font-work-sans)', letterSpacing: '-3.5%' }}>
-          life is not going stuck ,<br />
-          our decision makes it stuck
+        {/* Subtitle */}
+        <div className="text-lg font-medium text-gray-600" style={{ fontFamily: 'var(--font-work-sans)' }}>
+          Empowering communication through Malayalam Sign Language,<br />
+          in collaboration with NISH Institute, Trivandrum.
         </div>
       </div>
     </div>

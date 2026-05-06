@@ -1,36 +1,41 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useAuth, useUser } from '@clerk/nextjs';
+import { useAuth } from '@clerk/nextjs';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import Loading from '../components/Loading';
+import AlphabetTutorial from '../components/AlphabetTutorial';
 
 export default function Learning() {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const { isSignedIn } = useAuth();
-  const { user } = useUser();
+  const { isLoaded, isSignedIn } = useAuth();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
+    const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
-  if (!isSignedIn) {
-    router.push('/login');
+  useEffect(() => {
+    if (!isLoaded || isLoading) return;
+    if (!isSignedIn) router.push('/login');
+  }, [isLoaded, isSignedIn, isLoading, router]);
+
+  if (!isLoaded || !isSignedIn || isLoading) {
     return <Loading />;
   }
 
-  if (isLoading) {
-    return <Loading />;
+  function scrollToTutorial() {
+    var el = document.getElementById('alphabet-tutorial');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
   }
 
   return (
     <div className="min-h-screen bg-white">
       <Navigation />
       <main className="w-full max-w-[1440px] mx-auto px-8 py-8">
+
+        {/* Hero banner */}
         <div className="bg-white rounded-3xl p-8 relative overflow-hidden shadow-lg mb-8">
           <div className="absolute -top-8 -left-8 w-[1200px] h-[250px] bg-brand-orange rounded-full opacity-10"></div>
           <h1 className="text-4xl font-bold text-brand-dark mb-3" style={{ fontFamily: 'var(--font-work-sans)' }}>
@@ -41,22 +46,27 @@ export default function Learning() {
           </p>
         </div>
 
+        {/* Module cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+          <div onClick={scrollToTutorial} className="bg-white rounded-xl shadow-md p-6 border border-gray-100 cursor-pointer learning-card-active">
             <div className="w-12 h-12 bg-brand-orange rounded-lg flex items-center justify-center mb-4">
               <span className="text-white text-lg font-bold">A</span>
             </div>
             <h3 className="text-lg font-semibold text-brand-dark mb-2" style={{ fontFamily: 'var(--font-inter)' }}>
-              Alphabet & Numbers
+              Alphabet &amp; Numbers
             </h3>
             <p className="text-gray-600" style={{ fontFamily: 'var(--font-inter)' }}>
               Learn the foundational gestures with clear visuals and practice tasks.
             </p>
+            <p className="text-brand-orange text-sm font-medium mt-3" style={{ fontFamily: 'var(--font-inter)' }}>
+              Start learning &#x2193;
+            </p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-            <div className="w-12 h-12 bg-brand-orange rounded-lg flex items-center justify-center mb-4">
-              <span className="text-white text-lg font-bold">C</span>
+          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 relative opacity-70">
+            <span className="coming-soon-badge">COMING SOON</span>
+            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
+              <span className="text-gray-400 text-lg font-bold">C</span>
             </div>
             <h3 className="text-lg font-semibold text-brand-dark mb-2" style={{ fontFamily: 'var(--font-inter)' }}>
               Common Phrases
@@ -66,9 +76,10 @@ export default function Learning() {
             </p>
           </div>
 
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-            <div className="w-12 h-12 bg-brand-orange rounded-lg flex items-center justify-center mb-4">
-              <span className="text-white text-lg font-bold">I</span>
+          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100 relative opacity-70">
+            <span className="coming-soon-badge">COMING SOON</span>
+            <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mb-4">
+              <span className="text-gray-400 text-lg font-bold">I</span>
             </div>
             <h3 className="text-lg font-semibold text-brand-dark mb-2" style={{ fontFamily: 'var(--font-inter)' }}>
               Interactive Exercises
@@ -78,6 +89,10 @@ export default function Learning() {
             </p>
           </div>
         </div>
+
+        {/* Malayalam alphabet video tutorial */}
+        <AlphabetTutorial />
+
       </main>
       <Footer />
     </div>
