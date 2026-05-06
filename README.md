@@ -28,6 +28,8 @@ GestureMate is a real-time Malayalam sign language recognition and communication
 - [Project Structure](#project-structure)
 - [Dataset & Model](#dataset--model)
 - [Case Study](#case-study)
+- [Team](#team)
+- [Contact](#contact)
 - [Acknowledgements](#acknowledgements)
 
 ---
@@ -293,7 +295,7 @@ backend/
 └── test_live_core.py
 ```
 
-> **Note:** The trained model file (`static_sign_model.pkl`) must be present in `backend/model/`. If it is missing, contact the project maintainers or retrain the model using the provided dataset scripts. A dynamic gesture model (`sign_language_app/models/dynamic_model.pkl`) is optional; if absent, dynamic gesture recognition is automatically disabled.
+> **⚠️ Model Not Included in Repository:** The trained model file (`static_sign_model.pkl`) is **not included** in this repository because it exceeds GitHub's recommended file size limit (the file is ~70 MB). You will need to either request the model file directly from the project team or retrain it using your own dataset. To request the model, please reach out via the contact details in the [Contact](#contact) section below. A dynamic gesture model (`sign_language_app/models/dynamic_model.pkl`) is also required for dynamic gesture support; contact the team to obtain it.
 
 ---
 
@@ -338,7 +340,43 @@ GOOGLE_APPLICATION_CREDENTIALS=./gen-lang-client-xxxx.json
 
 - **Clerk keys:** Create a free application at [clerk.com](https://clerk.com) → Dashboard → API Keys.
 - **MongoDB URI:** Create a free cluster at [cloud.mongodb.com](https://cloud.mongodb.com), add a database user, and copy the connection string.
-- **Google Cloud TTS:** Create a project in the [Google Cloud Console](https://console.cloud.google.com), enable the **Text-to-Speech API**, create a service account, download the JSON key, and place it in the project root.
+- **Google Cloud TTS JSON key:** Follow the steps below.
+
+#### Obtaining the Google Cloud Text-to-Speech Service Account Key
+
+This is the JSON credentials file that allows GestureMate to call the Google Cloud Text-to-Speech API. Follow these steps to generate one:
+
+1. **Create or open a Google Cloud project**
+   - Go to the [Google Cloud Console](https://console.cloud.google.com).
+   - Click the project selector at the top and choose **New Project** (or select an existing one).
+
+2. **Enable the Text-to-Speech API**
+   - In the left sidebar, navigate to **APIs & Services → Library**.
+   - Search for **Cloud Text-to-Speech API** and click **Enable**.
+
+3. **Create a Service Account**
+   - Go to **APIs & Services → Credentials**.
+   - Click **+ Create Credentials → Service Account**.
+   - Give it a name (e.g., `gesturemate-tts`) and click **Create and Continue**.
+   - For the role, select **Basic → Editor** (or the more restrictive **Cloud Text-to-Speech User** if available).
+   - Click **Done**.
+
+4. **Generate and download the JSON key**
+   - On the **Credentials** page, click on the service account you just created.
+   - Go to the **Keys** tab → **Add Key → Create new key**.
+   - Select **JSON** and click **Create**.
+   - A `.json` file will be downloaded automatically to your computer.
+
+5. **Place the key file in the project**
+   - Move the downloaded JSON file into the project root directory (next to `package.json`).
+   - Rename it to something recognisable if needed (e.g., `gen-lang-client.json`).
+   - Set the `GOOGLE_APPLICATION_CREDENTIALS` variable in your `.env.local` to point to this file:
+
+   ```env
+   GOOGLE_APPLICATION_CREDENTIALS=./gen-lang-client.json
+   ```
+
+> **Security:** Never commit this JSON file to a public repository. It is already listed in `.gitignore` to prevent accidental exposure.
 
 ---
 
@@ -502,6 +540,27 @@ These insights directly shaped the design of GestureMate's Game Module — speci
 
 ---
 
+## Team
+
+This project was developed by the following team members as part of their Final Year B.Tech Computer Science & Engineering programme:
+
+| Name | Role |
+|---|---|
+| **Stephin Mathew** | Lead Developer — ML pipeline, Flask backend, Next.js frontend, system architecture |
+| **Kevin Biju Kulangara** | Frontend Development, UI/UX Design |
+| **Jeswin Sabu** | Dataset Collection & Annotation, Model Training |
+| **Prapanch J** | Learning & Game Module Development, Case Study Research |
+
+---
+
+## Contact
+
+For questions, collaboration enquiries, or to request the trained model files (which are not included in this repository due to file size constraints), please reach out:
+
+- **Stephin Mathew** — [stephinmathew2000@gmail.com](mailto:stephinmathew2000@gmail.com)
+
+---
+
 ## Acknowledgements
 
 - **National Institute for Speech and Hearing (NISH), Trivandrum** — for the standardised Malayalam Sign Language system that forms the basis of the gesture set used in this project.
@@ -511,4 +570,4 @@ These insights directly shaped the design of GestureMate's Game Module — speci
 
 ---
 
-*Developed as a Final Year B.Tech Computer Science & Engineering Project.*
+*Developed as a Final Year B.Tech Computer Science & Engineering Project by Stephin Mathew, Kevin Biju Kulangara, Jeswin Sabu, and Prapanch J.*
