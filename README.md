@@ -4,6 +4,8 @@
 
 GestureMate is a real-time Malayalam sign language recognition and communication platform designed to bridge the communication gap between deaf and mute individuals and the general public — without the need for a human interpreter. The system recognises hand gestures conforming to the **Malayalam Sign Language standard developed by the National Institute for Speech and Hearing (NISH), Trivandrum**, converts them into text, and also provides bidirectional voice–text support so that hearing users can communicate naturally with deaf and mute users on the same screen.
 
+**Team:** Stephin Mathew · Kevin Biju Kulangara · Jeswin Sabu · Prapanch J
+
 ---
 
 ## Table of Contents
@@ -537,19 +539,6 @@ Key findings from the case study:
 - Students responded positively to gamified learning formats and indicated that interactive practice tools would significantly improve their motivation and retention.
 
 These insights directly shaped the design of GestureMate's Game Module — specifically the progressive difficulty structure, XP reward system, and the availability of in-game video tutorials that allow students to reference the correct gesture for any character without leaving the practice environment.
-
----
-
-## Team
-
-This project was developed by the following team members as part of their Final Year B.Tech Computer Science & Engineering programme:
-
-| Name | Role |
-|---|---|
-| **Stephin Mathew** | Lead Developer — ML pipeline, Flask backend, Next.js frontend, system architecture |
-| **Kevin Biju Kulangara** | Frontend Development, UI/UX Design |
-| **Jeswin Sabu** | Dataset Collection & Annotation, Model Training |
-| **Prapanch J** | Learning & Game Module Development, Case Study Research |
 
 ---
 
