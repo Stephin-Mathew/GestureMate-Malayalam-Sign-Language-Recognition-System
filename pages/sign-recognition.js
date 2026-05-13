@@ -58,15 +58,12 @@ export default function SignRecognition() {
     setIsLoading(false);
   }, []);
 
-  // ── Auth guard ─────────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (!isLoaded || isLoading) return;
-    if (!isSignedIn) router.push('/login');
-  }, [isLoaded, isSignedIn, isLoading, router]);
+  // ── No auth redirect — guests are allowed on this page ────────────────────
 
   // ── Flask status poll ──────────────────────────────────────────────────────
   useEffect(() => {
-    if (!isLoaded || !isSignedIn || isLoading) return;
+    // Allow polling for all users (including guests) so the camera feed works
+    if (!isLoaded || isLoading) return;
     const poll = async () => {
       try {
         const res = await fetch('/api/status');
@@ -156,13 +153,13 @@ export default function SignRecognition() {
     const id = setInterval(poll, 200);
     poll();
     return () => clearInterval(id);
-  }, [isLoaded, isSignedIn, isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoaded, isLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep a ref in sync with fastMode so the polling closure can read it without stale captures
   const fastModeRef = useRef(fastMode);
   useEffect(() => { fastModeRef.current = fastMode; }, [fastMode]);
 
-  // ── Auto-start mic once the page is ready ────────────────────────────────
+  // ── Auto-start mic once the page is ready (signed-in users only) ─────────
   useEffect(() => {
     if (!isLoaded || !isSignedIn || isLoading) return;
     micPausedRef.current = false;
@@ -375,7 +372,8 @@ export default function SignRecognition() {
   };
 
   // ── Render guards ──────────────────────────────────────────────────────────
-  if (!isLoaded || !isSignedIn) return <Loading />;
+  // Guests are allowed — only block while Clerk is still initialising
+  if (!isLoaded) return <Loading />;
   if (isLoading) return <Loading />;
 
   // ══════════════════════════════════════════════════════════════════════════
@@ -607,15 +605,27 @@ export default function SignRecognition() {
                 </button>
               </div>
 
-              <button
-                onClick={() => speakText(sentence)}
-                disabled={!sentence.trim()}
-                className={`w-full text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed ${isSpeaking ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-600 hover:bg-emerald-700'
-                  }`}
-                style={{ fontFamily: 'var(--font-glory)' }}
-              >
-                {isSpeaking ? '■ Stop Audio' : '▶ Speak (TTS)'}
-              </button>
+              {/* ── TTS — locked for guests ──────────────────────────────── */}
+              {isSignedIn ? (
+                <button
+                  onClick={() => speakText(sentence)}
+                  disabled={!sentence.trim()}
+                  className={`w-full text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed ${isSpeaking ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-600 hover:bg-emerald-700'
+                    }`}
+                  style={{ fontFamily: 'var(--font-glory)' }}
+                >
+                  {isSpeaking ? '■ Stop Audio' : '▶ Speak (TTS)'}
+                </button>
+              ) : (
+                <div
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium border-2 border-dashed border-gray-300 bg-gray-50 text-gray-400 cursor-not-allowed select-none"
+                  style={{ fontFamily: 'var(--font-glory)' }}
+                  title="Log in to use Text-to-Speech"
+                >
+                  <span style={{ fontSize: '1rem' }}>🔒</span>
+                  <span>Text-to-Speech — <a href="/login" className="text-brand-orange font-semibold underline underline-offset-2 hover:text-orange-600">Log in</a> to unlock</span>
+                </div>
+              )}
             </div>
 
             {/* ── Divider ─────────────────────────────────────────── */}
@@ -625,82 +635,110 @@ export default function SignRecognition() {
               <div className="flex-1 h-px bg-gray-200" />
             </div>
 
-            {/* ── Voice input ─────────────────────────────────────── */}
-            <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3" style={{ fontFamily: 'var(--font-inter)' }}>Voice → Text</p>
+            {/* ── Voice → Text — locked for guests ─────────────────── */}
+            {isSignedIn ? (
+              <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3" style={{ fontFamily: 'var(--font-inter)' }}>Voice → Text</p>
 
-              {/* Mic button + status */}
-              <div className="flex items-center gap-4 mb-4">
-                <button
-                  onClick={toggleRecording}
-                  title={isRecording ? 'Pause mic' : 'Resume mic'}
-                  className={`w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center text-white transition-all duration-200 shadow-md ${isRecording
-                    ? 'bg-emerald-500 animate-pulse shadow-emerald-200'
-                    : isSpeaking
-                      ? 'bg-gray-400 cursor-not-allowed'
-                      : 'bg-gray-500 hover:bg-gray-600'
-                    }`}
-                >
-                  {isRecording ? (
-                    /* pause icon — two bars */
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <rect x="6" y="4" width="4" height="16" rx="1" />
-                      <rect x="14" y="4" width="4" height="16" rx="1" />
-                    </svg>
-                  ) : (
-                    /* mic icon */
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
-                      <path d="M19 10v2a7 7 0 0 1-14 0v-2a1 1 0 1 0-2 0v2a9 9 0 0 0 8 8.94V22H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-1.06A9 9 0 0 0 21 12v-2a1 1 0 1 0-2 0z" />
-                    </svg>
-                  )}
-                </button>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-brand-dark" style={{ fontFamily: 'var(--font-inter)' }}>
-                    {isRecording
-                      ? '● Listening…'
-                      : isSpeaking
-                        ? '⏸ Paused (TTS playing)'
-                        : '⏸ Paused — click to resume'}
-                  </p>
-                  <p className="text-xs text-gray-400" style={{ fontFamily: 'var(--font-inter)' }}>Malayalam (ml-IN)</p>
-                </div>
-                {voiceTranscript && (
+                {/* Mic button + status */}
+                <div className="flex items-center gap-4 mb-4">
                   <button
-                    onClick={() => { setVoiceTranscript(''); setInterimTranscript(''); }}
-                    className="text-xs text-gray-400 hover:text-red-500 transition-colors px-2 py-1 rounded"
-                    title="Clear transcript">
-                    ✕ Clear
+                    onClick={toggleRecording}
+                    title={isRecording ? 'Pause mic' : 'Resume mic'}
+                    className={`w-14 h-14 rounded-full flex-shrink-0 flex items-center justify-center text-white transition-all duration-200 shadow-md ${isRecording
+                      ? 'bg-emerald-500 animate-pulse shadow-emerald-200'
+                      : isSpeaking
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-gray-500 hover:bg-gray-600'
+                      }`}
+                  >
+                    {isRecording ? (
+                      /* pause icon — two bars */
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="4" width="4" height="16" rx="1" />
+                        <rect x="14" y="4" width="4" height="16" rx="1" />
+                      </svg>
+                    ) : (
+                      /* mic icon */
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" />
+                        <path d="M19 10v2a7 7 0 0 1-14 0v-2a1 1 0 1 0-2 0v2a9 9 0 0 0 8 8.94V22H8a1 1 0 1 0 0 2h8a1 1 0 1 0 0-2h-3v-1.06A9 9 0 0 0 21 12v-2a1 1 0 1 0-2 0z" />
+                      </svg>
+                    )}
                   </button>
-                )}
-              </div>
-
-              {/* Interim text */}
-              {interimTranscript && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-2">
-                  <p className="text-sm text-blue-600 italic" style={{ fontFamily: 'var(--font-inter)' }}>{interimTranscript}</p>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-brand-dark" style={{ fontFamily: 'var(--font-inter)' }}>
+                      {isRecording
+                        ? '● Listening…'
+                        : isSpeaking
+                          ? '⏸ Paused (TTS playing)'
+                          : '⏸ Paused — click to resume'}
+                    </p>
+                    <p className="text-xs text-gray-400" style={{ fontFamily: 'var(--font-inter)' }}>Malayalam (ml-IN)</p>
+                  </div>
+                  {voiceTranscript && (
+                    <button
+                      onClick={() => { setVoiceTranscript(''); setInterimTranscript(''); }}
+                      className="text-xs text-gray-400 hover:text-red-500 transition-colors px-2 py-1 rounded"
+                      title="Clear transcript">
+                      ✕ Clear
+                    </button>
+                  )}
                 </div>
-              )}
 
-              {/* Final transcript */}
-              <div
-                className="bg-gray-50 border border-gray-200 rounded-xl min-h-[72px] p-3 text-brand-dark text-base break-words mb-3"
-                style={{ fontFamily: 'var(--font-inter)' }}
-              >
-                {voiceTranscript || <span className="text-gray-300">Spoken text appears here automatically…</span>}
+                {/* Interim text */}
+                {interimTranscript && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-2">
+                    <p className="text-sm text-blue-600 italic" style={{ fontFamily: 'var(--font-inter)' }}>{interimTranscript}</p>
+                  </div>
+                )}
+
+                {/* Final transcript */}
+                <div
+                  className="bg-gray-50 border border-gray-200 rounded-xl min-h-[72px] p-3 text-brand-dark text-base break-words mb-3"
+                  style={{ fontFamily: 'var(--font-inter)' }}
+                >
+                  {voiceTranscript || <span className="text-gray-300">Spoken text appears here automatically…</span>}
+                </div>
+
+                {/* Speak voice transcript */}
+                <button
+                  onClick={() => speakText(voiceTranscript)}
+                  disabled={!voiceTranscript.trim()}
+                  className={`w-full text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed ${isSpeaking ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-600 hover:bg-emerald-700'
+                    }`}
+                  style={{ fontFamily: 'var(--font-glory)' }}
+                >
+                  {isSpeaking ? '■ Stop Audio' : '▶ Speak Voice Text (TTS)'}
+                </button>
               </div>
-
-              {/* Speak voice transcript */}
-              <button
-                onClick={() => speakText(voiceTranscript)}
-                disabled={!voiceTranscript.trim()}
-                className={`w-full text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed ${isSpeaking ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-600 hover:bg-emerald-700'
-                  }`}
-                style={{ fontFamily: 'var(--font-glory)' }}
-              >
-                {isSpeaking ? '■ Stop Audio' : '▶ Speak Voice Text (TTS)'}
-              </button>
-            </div>
+            ) : (
+              /* ── Guest lock card for Voice → Text ─────────────────── */
+              <div className="bg-white rounded-xl shadow-md border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-4 py-10 px-6 text-center">
+                <div
+                  className="w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-md"
+                  style={{ background: 'linear-gradient(135deg,#fde68a,#fbbf24)' }}
+                >
+                  🔒
+                </div>
+                <div>
+                  <p className="font-bold text-brand-dark text-base mb-1" style={{ fontFamily: 'var(--font-inter)' }}>
+                    Voice → Text &amp; TTS is locked
+                  </p>
+                  <p className="text-xs text-gray-500 max-w-[200px] mx-auto" style={{ fontFamily: 'var(--font-inter)' }}>
+                    Log in to use Malayalam voice recognition and text-to-speech features.
+                  </p>
+                </div>
+                <a
+                  href="/login"
+                  className="inline-flex items-center gap-2 bg-brand-orange text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-orange-600 transition-colors shadow-sm"
+                  style={{ fontFamily: 'var(--font-inter)' }}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm-1-11v2H9l3 3 3-3h-2V9h-2z"/></svg>
+                  Log in to unlock
+                </a>
+              </div>
+            )}
           </div>
         </div>
       </main>

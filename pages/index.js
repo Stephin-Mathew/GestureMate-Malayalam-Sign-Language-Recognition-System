@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useAuth } from '@clerk/nextjs';
 import Navigation from '../components/Navigation';
@@ -9,26 +8,8 @@ import Footer from '../components/Footer';
 import Loading from '../components/Loading';
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(true);
-  const { isSignedIn, isLoaded } = useAuth();
+  const { isLoaded } = useAuth();
   const router = useRouter();
-
-  useEffect(() => {
-    // Wait for Clerk to load authentication state
-    if (isLoaded) {
-      if (!isSignedIn) {
-        router.push('/login');
-        return;
-      }
-
-      // Simulate loading
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    }
-  }, [isLoaded, isSignedIn, router]);
 
   const handleFeatureClick = (feature) => {
     switch (feature) {
@@ -44,12 +25,8 @@ export default function Home() {
     }
   };
 
-  // Show loading while Clerk is loading or user is not authenticated
-  if (!isLoaded || !isSignedIn) {
-    return <Loading />;
-  }
-
-  if (isLoading) {
+  // Show loading while Clerk is initialising (so nav renders correctly)
+  if (!isLoaded) {
     return <Loading />;
   }
 
