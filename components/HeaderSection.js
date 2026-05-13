@@ -1,59 +1,124 @@
 import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
 
 const HeaderSection = () => {
   const { user } = useUser();
-  const displayName = user?.firstName || user?.fullName || user?.username || 'User';
+  const displayName = user?.firstName || user?.fullName?.split(' ')[0] || 'User';
+
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('en-US', {
+    year: 'numeric', month: 'long', day: 'numeric',
+  });
 
   return (
-    <div className="bg-white rounded-3xl p-8 mx-8 mt-24 relative overflow-hidden">
-      {/* Background decorative element */}
-      <div className="absolute -top-7 -left-7 w-[1350px] h-[305px] bg-brand-orange rounded-full opacity-10"></div>
+    <div style={{
+      background: '#FEF0E6',
+      borderRadius: 24,
+      display: 'flex',
+      alignItems: 'stretch',
+      justifyContent: 'space-between',
+      paddingLeft: 48,
+      overflow: 'hidden',
+      height: 300,
+    }}>
 
-      {/* Notification Icon */}
-      <div className="absolute top-[54px] right-[163px] w-11 h-12 bg-white rounded-full flex items-center justify-center shadow-lg cursor-pointer hover:bg-gray-50 transition-colors">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C10.896 2 10 2.896 10 4V5.586L8.707 6.879C8.317 7.269 8.317 7.902 8.707 8.293L10 9.586V20H14V9.586L15.293 8.293C15.683 7.902 15.683 7.269 15.293 6.879L14 5.586V4C14 2.896 13.104 2 12 2Z" fill="#F97316" />
-        </svg>
-      </div>
+      {/* ── LEFT: Text content ── */}
+      <div style={{
+        flex: '0 0 auto',
+        maxWidth: 420,
+        padding: '40px 0 40px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+      }}>
+        <p style={{
+          fontSize: 14,
+          fontWeight: 600,
+          color: '#F97316',
+          fontFamily: 'Inter, sans-serif',
+          margin: '0 0 6px',
+        }}>
+          {formattedDate}
+        </p>
 
-      {/* Notification Badge */}
-      <div className="absolute top-[54px] right-[157px] w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-        <span className="text-white text-xs font-bold">8+</span>
-      </div>
-
-      {/* Profile Image */}
-      <div className="absolute top-[31px] right-[26px] w-28 h-28 bg-gray-300 rounded-2xl overflow-hidden flex items-center justify-center shadow-lg">
-        <img
-          src="/images/profile-image.svg"
-          alt="Profile"
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.target.style.display = 'none';
-            e.target.nextSibling.style.display = 'flex';
-          }}
-        />
-        <div className="w-full h-full bg-brand-orange flex items-center justify-center text-white text-xl font-bold">
-          {displayName.charAt(0).toUpperCase()}
-        </div>
-      </div>
-
-      {/* Date */}
-      <div className="text-2xl font-bold text-brand-dark mb-4" style={{ fontFamily: 'var(--font-work-sans)' }}>
-        {new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
-      </div>
-
-      {/* Welcome Message */}
-      <div className="mb-8">
-        <h1 className="text-5xl font-semibold text-brand-dark mb-4" style={{ fontFamily: 'var(--font-work-sans)', letterSpacing: '4.5%' }}>
+        <h1 style={{
+          fontSize: 54,
+          fontWeight: 800,
+          color: '#111214',
+          fontFamily: 'Inter, sans-serif',
+          lineHeight: 1.05,
+          margin: '0 0 14px',
+        }}>
           Hello, {displayName}
         </h1>
 
-        {/* Subtitle */}
-        <div className="text-lg font-medium text-gray-600" style={{ fontFamily: 'var(--font-work-sans)' }}>
-          Empowering communication through Malayalam Sign Language,<br />
+        <p style={{
+          fontSize: 14.5,
+          color: '#666',
+          fontFamily: 'Inter, sans-serif',
+          lineHeight: 1.65,
+          margin: '0 0 30px',
+          maxWidth: 360,
+        }}>
+          Empowering communication through Malayalam Sign Language,{' '}
           in collaboration with NISH Institute, Trivandrum.
+        </p>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+          <Link href="/sign-recognition" style={{
+            background: '#F97316',
+            color: '#fff',
+            padding: '12px 26px',
+            borderRadius: 10,
+            fontWeight: 600,
+            fontSize: 15,
+            fontFamily: 'Inter, sans-serif',
+            textDecoration: 'none',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+          }}>
+            Get Started
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Link>
+
+          <Link href="/learning" style={{
+            background: 'transparent',
+            color: '#111214',
+            padding: '12px 22px',
+            borderRadius: 10,
+            fontWeight: 600,
+            fontSize: 15,
+            fontFamily: 'Inter, sans-serif',
+            textDecoration: 'none',
+            border: '1.5px solid #CCC',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+          }}>
+            Learn More
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="#111214" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Link>
         </div>
       </div>
+
+      {/* ── RIGHT: Hero card image ── */}
+      <img
+        src="/images/herocard.png"
+        alt="Hero Card"
+        style={{
+          height: '100%',
+          width: 'auto',
+          objectFit: 'contain',
+          objectPosition: 'bottom right',
+          display: 'block',
+          flexShrink: 0,
+        }}
+      />
     </div>
   );
 };

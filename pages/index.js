@@ -2,7 +2,6 @@ import { useRouter } from 'next/router';
 import { useAuth } from '@clerk/nextjs';
 import Navigation from '../components/Navigation';
 import HeaderSection from '../components/HeaderSection';
-
 import FeatureCard from '../components/FeatureCard';
 import Footer from '../components/Footer';
 import Loading from '../components/Loading';
@@ -11,63 +10,69 @@ export default function Home() {
   const { isLoaded } = useAuth();
   const router = useRouter();
 
-  const handleFeatureClick = (feature) => {
-    switch (feature) {
-      case 'sign-recognition':
-        router.push('/sign-recognition');
-        break;
-      case 'voice-translation':
-        // Voice translation is now a tab inside sign-recognition
-        router.push('/sign-recognition?mode=voice');
-        break;
-      default:
-        break;
-    }
-  };
-
-  // Show loading while Clerk is initialising (so nav renders correctly)
+  // Show loading while Clerk is initialising
   if (!isLoaded) {
     return <Loading />;
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ minHeight: '100vh', background: '#fff', display: 'flex', flexDirection: 'column' }}>
       {/* Navigation */}
       <Navigation />
 
       {/* Main Content */}
-      <main className="w-full max-w-[1440px] mx-auto">
-        {/* Header Section */}
-        <div className="relative px-8 pt-6">
-          <HeaderSection />
-        </div>
+
+      <main style={{ flex: 1, maxWidth: 1280, margin: '0 auto', width: '100%', padding: '24px 32px 0' }}>
+
+        {/* Hero / Header Section */}
+        <HeaderSection />
 
         {/* Feature Cards Grid */}
-        <div className="px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <FeatureCard
-              title="Sign Recognition"
-              description="Real-time sign language to text translation using advanced AI and computer vision technology"
-              imageSrc="/images/sign-recognition-icon.svg"
-              onClick={() => handleFeatureClick('sign-recognition')}
-            />
-            <FeatureCard
-              title="Custom Training"
-              description="Learn sign language at your own pace with interactive lessons and real-time feedback"
-              imageSrc="/images/custom-training-icon.svg"
-            />
-            <FeatureCard
-              title="Learning"
-              description="Comprehensive sign language learning modules with progress tracking and interactive exercises"
-              imageSrc="/images/learning-icon.svg"
-            />
-            <FeatureCard
-              title="Voice Translation"
-              description="Speak Malayalam and convert it to text using advanced voice recognition, then play it back with TTS"
-              imageSrc="/images/voice-translation-icon.svg"
-              onClick={() => handleFeatureClick('voice-translation')}
-            />
-          </div>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, 1fr)',
+          gap: 20,
+          padding: '32px 0 32px',
+        }}>
+          {/* 01 - Sign Recognition */}
+          <FeatureCard
+            number="01"
+            title="Sign Recognition"
+            description="Real-time sign language to text translation using advanced AI and computer vision technology."
+            imageSrc="/images/Sign Recognition Icon.png"
+            buttonText="Try Now"
+            onClick={() => router.push('/sign-recognition')}
+          />
+
+          {/* 02 - Gaming Module */}
+          <FeatureCard
+            number="02"
+            title="Gaming Module"
+            description="Learn and practice through fun games designed to improve your sign language skills."
+            imageSrc="/images/Gaming Module Controller.png"
+            buttonText="Play Now"
+            onClick={() => router.push('/custom-training')}
+          />
+
+          {/* 03 - Learning Module */}
+          <FeatureCard
+            number="03"
+            title="Learning Module"
+            description="Explore signs by characters and watch video demonstrations to learn Malayalam Sign Language step by step."
+            imageSrc="/images/Learning Module Screen.png"
+            buttonText="Start Learning"
+            onClick={() => router.push('/learning')}
+          />
+
+          {/* 04 - Voice & Text Tools */}
+          <FeatureCard
+            number="04"
+            title="Voice & Text Tools"
+            description="Convert speech to text and text to speech in Malayalam for seamless communication."
+            imageSrc="/images/Voice Wave Icon (Small Variant).png"
+            buttonText="Explore Tools"
+            onClick={() => router.push('/sign-recognition?mode=voice')}
+          />
         </div>
       </main>
 

@@ -7,7 +7,7 @@ import Footer from '../components/Footer';
 import Loading from '../components/Loading';
 
 // Floating Malayalam characters for the animated background
-const BG_CHARS = ['അ','ആ','ഇ','ക','ച','ന','മ','ര','ല','വ','സ','ഗ','ഭ','ജ','ത','പ','ബ','ഡ','ഹ','ഴ'];
+const BG_CHARS = ['അ', 'ആ', 'ഇ', 'ക', 'ച', 'ന', 'മ', 'ര', 'ല', 'വ', 'സ', 'ഗ', 'ഭ', 'ജ', 'ത', 'പ', 'ബ', 'ഡ', 'ഹ', 'ഴ'];
 
 function FloatingChar({ char, style }) {
   return (
@@ -29,9 +29,9 @@ function FloatingChar({ char, style }) {
 }
 
 export default function CustomTraining() {
-  const [isLoading, setIsLoading]   = useState(true);
-  const [progress, setProgress]     = useState(null);
-  const [hovering, setHovering]     = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [progress, setProgress] = useState(null);
+  const [hovering, setHovering] = useState(false);
   const router = useRouter();
   const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
@@ -53,7 +53,7 @@ export default function CustomTraining() {
       try {
         const res = await fetch(`/api/game-progress?clerkId=${user.id}`);
         if (res.ok) setProgress(await res.json());
-      } catch {}
+      } catch { }
     };
     fetchProgress();
   }, [isLoaded, isSignedIn, user]);
@@ -66,7 +66,7 @@ export default function CustomTraining() {
     style: {
       size: `${1.8 + (i % 4) * 0.7}rem`,
       left: `${(i * 17 + 5) % 95}%`,
-      top:  `${(i * 13 + 3) % 85}%`,
+      top: `${(i * 13 + 3) % 85}%`,
       duration: 3.5 + (i % 3) * 1.2,
       delay: (i % 5) * 0.6,
       rotate: -20 + (i % 7) * 8,
@@ -186,9 +186,9 @@ export default function CustomTraining() {
               {progress && (
                 <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '20px', flexWrap: 'wrap' }}>
                   {[
-                    { label: 'Level',     value: progress.currentLevel },
-                    { label: 'Total XP',  value: `${progress.totalXP} ✨` },
-                    { label: 'Done',      value: `${progress.completedLevels?.length || 0}/15` },
+                    { label: 'Level', value: progress.currentLevel },
+                    { label: 'Total XP', value: `${progress.totalXP} ✨` },
+                    { label: 'Done', value: `${progress.completedLevels?.length || 0}/15` },
                   ].map(s => (
                     <div key={s.label} style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f97316' }}>{s.value}</div>
