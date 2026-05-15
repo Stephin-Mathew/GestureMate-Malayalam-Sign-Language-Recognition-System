@@ -380,7 +380,7 @@ export default function SignRecognition() {
   // UI
   // ══════════════════════════════════════════════════════════════════════════
   return (
-    <div className="min-h-screen bg-white">
+    <div style={{ minHeight: '100vh', background: 'var(--background)' }}>
       <Head>
         <title>Sign Recognition – GestureMate</title>
         {/* Pre-open TCP connection to Flask so the feed loads faster */}
@@ -392,9 +392,9 @@ export default function SignRecognition() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* ── LEFT: Camera feed ──────────────────────────────────────────── */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-4 border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-semibold text-brand-dark" style={{ fontFamily: 'var(--font-inter)' }}>
+          <div style={{ gridColumn: 'span 2', background: 'var(--card-bg)', borderRadius: '0.75rem', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', padding: '1rem', border: '1px solid var(--card-border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+              <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--foreground)', fontFamily: 'var(--font-inter)' }}>
                 Live Camera Feed
               </h2>
               <span className={`text-sm font-medium ${isConnected ? 'text-green-600' : 'text-red-600'}`}>
@@ -421,11 +421,11 @@ export default function SignRecognition() {
             </div>
           </div>
 
-          {/* ── RIGHT: Controls ────────────────────────────────────────────── */}
-          <div className="flex flex-col gap-4">
+            {/* ── RIGHT: Controls ────────────────────────────────────────────── */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
-            {/* ── Sign output ─────────────────────────────────────── */}
-            <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100">
+              {/* ── Sign output ─────────────────────────────────────── */}
+              <div style={{ background: 'var(--card-bg)', borderRadius: '0.75rem', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', padding: '1.25rem', border: '1px solid var(--card-border)' }}>
               <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3" style={{ fontFamily: 'var(--font-inter)' }}>Sign Recognition</p>
 
               {/* ── Fast Conversation toggle ─────────────────────────── */}
@@ -480,7 +480,7 @@ export default function SignRecognition() {
               </button>
 
               {/* ── Mode toggle ─────────────────────────────────────── */}
-              <div className="flex gap-2 mb-4 p-1 bg-gray-100 rounded-xl">
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', padding: '4px', background: 'var(--subtle-bg)', borderRadius: '0.75rem' }}>
                 {['static', 'dynamic'].map((m) => (
                   <button
                     key={m}
@@ -516,30 +516,29 @@ export default function SignRecognition() {
                 )}
               </div>
 
-              <div className="flex items-center gap-4 mb-3">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '0.75rem' }}>
                 <div>
-                  <p className="text-xs text-gray-500 mb-1" style={{ fontFamily: 'var(--font-inter)' }}>Detected</p>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--muted-text)', marginBottom: '0.25rem', fontFamily: 'var(--font-inter)' }}>Detected</p>
                   <div className="text-5xl font-bold text-brand-orange leading-none">{char}</div>
                 </div>
-                <div className="flex-1 space-y-2">
+                <div style={{ flex: 1 }}>
                   {/* Confidence */}
                   <div>
-                    <p className="text-xs text-gray-500 mb-1" style={{ fontFamily: 'var(--font-inter)' }}>Confidence</p>
-                    <div className="w-full bg-gray-100 rounded-full h-2">
+                    <p style={{ fontSize: '0.75rem', color: 'var(--muted-text)', marginBottom: '0.25rem', fontFamily: 'var(--font-inter)' }}>Confidence</p>
+                    <div style={{ width: '100%', background: 'var(--subtle-bg)', borderRadius: '9999px', height: '8px' }}>
                       <div
                         className="bg-brand-orange h-2 rounded-full transition-all duration-300"
                         style={{ width: `${Math.min(confidence * 100, 100)}%` }}
                       />
                     </div>
-                    <p className="text-xs text-gray-500 mt-1 font-medium">{(confidence * 100).toFixed(1)}%</p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--muted-text)', marginTop: '0.25rem', fontWeight: 500 }}>{(confidence * 100).toFixed(1)}%</p>
                   </div>
-                  {/* Dynamic frame buffer — only shown in dynamic mode */}
                   {recognitionMode === 'dynamic' ? (
                     <div>
-                      <p className="text-xs text-gray-500 mb-1" style={{ fontFamily: 'var(--font-inter)' }}>
+                      <p style={{ fontSize: '0.75rem', color: 'var(--muted-text)', marginBottom: '0.25rem', fontFamily: 'var(--font-inter)' }}>
                         Frames buffered<span className="ml-1 font-semibold text-blue-600">{dynamicFrames}/30</span>
                       </p>
-                      <div className="w-full bg-gray-100 rounded-full h-2">
+                      <div style={{ width: '100%', background: 'var(--subtle-bg)', borderRadius: '9999px', height: '8px' }}>
                         <div
                           className="bg-blue-500 h-2 rounded-full transition-all duration-150"
                           style={{ width: `${(dynamicFrames / 30) * 100}%` }}
@@ -585,10 +584,9 @@ export default function SignRecognition() {
 
               {/* Sentence box */}
               <div
-                className="text-xl bg-gray-50 border border-gray-200 rounded-xl min-h-[72px] p-3 text-brand-dark mb-3 break-words"
-                style={{ fontFamily: 'var(--font-inter)' }}
+                style={{ fontSize: '1.25rem', background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '0.75rem', minHeight: '72px', padding: '0.75rem', color: 'var(--foreground)', marginBottom: '0.75rem', wordBreak: 'break-words', fontFamily: 'var(--font-inter)' }}
               >
-                {sentence || <span className="text-gray-300">Sentence will appear here…</span>}
+                {sentence || <span style={{ color: 'var(--muted-text-3)' }}>Sentence will appear here…</span>}
               </div>
 
               {/* Sign action buttons */}
@@ -614,7 +612,7 @@ export default function SignRecognition() {
                     }`}
                   style={{ fontFamily: 'var(--font-glory)' }}
                 >
-                  {isSpeaking ? '■ Stop Audio' : '▶ Speak (TTS)'}
+                  {isSpeaking ? '■ Stop Audio' : '▶ Convert Text to Audio'}
                 </button>
               ) : (
                 <div
@@ -629,16 +627,16 @@ export default function SignRecognition() {
             </div>
 
             {/* ── Divider ─────────────────────────────────────────── */}
-            <div className="flex items-center gap-2">
-              <div className="flex-1 h-px bg-gray-200" />
-              <span className="text-xs text-gray-400 font-medium px-1" style={{ fontFamily: 'var(--font-inter)' }}>ALSO</span>
-              <div className="flex-1 h-px bg-gray-200" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <div style={{ flex: 1, height: 1, background: 'var(--card-border)' }} />
+              <span style={{ fontSize: '0.75rem', color: 'var(--muted-text-2)', fontWeight: 500, padding: '0 0.25rem', fontFamily: 'var(--font-inter)' }}>ALSO</span>
+              <div style={{ flex: 1, height: 1, background: 'var(--card-border)' }} />
             </div>
 
             {/* ── Voice → Text — locked for guests ─────────────────── */}
             {isSignedIn ? (
-              <div className="bg-white rounded-xl shadow-md p-5 border border-gray-100">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3" style={{ fontFamily: 'var(--font-inter)' }}>Voice → Text</p>
+              <div style={{ background: 'var(--card-bg)', borderRadius: '0.75rem', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', padding: '1.25rem', border: '1px solid var(--card-border)' }}>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--muted-text-2)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '0.75rem', fontFamily: 'var(--font-inter)' }}>Voice → Text</p>
 
                 {/* Mic button + status */}
                 <div className="flex items-center gap-4 mb-4">
@@ -666,15 +664,15 @@ export default function SignRecognition() {
                       </svg>
                     )}
                   </button>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-brand-dark" style={{ fontFamily: 'var(--font-inter)' }}>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontSize: '0.875rem', fontWeight: 500, color: 'var(--foreground)', fontFamily: 'var(--font-inter)' }}>
                       {isRecording
                         ? '● Listening…'
                         : isSpeaking
                           ? '⏸ Paused (TTS playing)'
                           : '⏸ Paused — click to resume'}
                     </p>
-                    <p className="text-xs text-gray-400" style={{ fontFamily: 'var(--font-inter)' }}>Malayalam (ml-IN)</p>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--muted-text-2)', fontFamily: 'var(--font-inter)' }}>Malayalam (ml-IN)</p>
                   </div>
                   {voiceTranscript && (
                     <button
@@ -688,33 +686,23 @@ export default function SignRecognition() {
 
                 {/* Interim text */}
                 {interimTranscript && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 mb-2">
+                  <div style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid rgba(59,130,246,0.2)', borderRadius: '0.5rem', padding: '0.5rem', marginBottom: '0.5rem' }}>
                     <p className="text-sm text-blue-600 italic" style={{ fontFamily: 'var(--font-inter)' }}>{interimTranscript}</p>
                   </div>
                 )}
 
                 {/* Final transcript */}
                 <div
-                  className="bg-gray-50 border border-gray-200 rounded-xl min-h-[72px] p-3 text-brand-dark text-base break-words mb-3"
-                  style={{ fontFamily: 'var(--font-inter)' }}
+                  style={{ background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '0.75rem', minHeight: '72px', padding: '0.75rem', color: 'var(--foreground)', fontSize: '1rem', wordBreak: 'break-words', marginBottom: '0.75rem', fontFamily: 'var(--font-inter)' }}
                 >
-                  {voiceTranscript || <span className="text-gray-300">Spoken text appears here automatically…</span>}
+                  {voiceTranscript || <span style={{ color: 'var(--muted-text-3)' }}>Spoken text appears here automatically…</span>}
                 </div>
 
-                {/* Speak voice transcript */}
-                <button
-                  onClick={() => speakText(voiceTranscript)}
-                  disabled={!voiceTranscript.trim()}
-                  className={`w-full text-white px-4 py-2.5 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed ${isSpeaking ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-600 hover:bg-emerald-700'
-                    }`}
-                  style={{ fontFamily: 'var(--font-glory)' }}
-                >
-                  {isSpeaking ? '■ Stop Audio' : '▶ Speak Voice Text (TTS)'}
-                </button>
+
               </div>
             ) : (
               /* ── Guest lock card for Voice → Text ─────────────────── */
-              <div className="bg-white rounded-xl shadow-md border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-4 py-10 px-6 text-center">
+              <div style={{ background: 'var(--card-bg)', borderRadius: '0.75rem', boxShadow: '0 2px 12px rgba(0,0,0,0.08)', border: '2px dashed var(--card-border)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', padding: '40px 24px', textAlign: 'center' }}>
                 <div
                   className="w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-md"
                   style={{ background: 'linear-gradient(135deg,#fde68a,#fbbf24)' }}
@@ -722,10 +710,10 @@ export default function SignRecognition() {
                   🔒
                 </div>
                 <div>
-                  <p className="font-bold text-brand-dark text-base mb-1" style={{ fontFamily: 'var(--font-inter)' }}>
+                  <p style={{ fontWeight: 700, color: 'var(--foreground)', fontSize: '1rem', marginBottom: '0.25rem', fontFamily: 'var(--font-inter)' }}>
                     Voice → Text &amp; TTS is locked
                   </p>
-                  <p className="text-xs text-gray-500 max-w-[200px] mx-auto" style={{ fontFamily: 'var(--font-inter)' }}>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--muted-text)', maxWidth: '200px', margin: '0 auto', fontFamily: 'var(--font-inter)' }}>
                     Log in to use Malayalam voice recognition and text-to-speech features.
                   </p>
                 </div>
@@ -747,8 +735,7 @@ export default function SignRecognition() {
 
       {/* Toast */}
       {showToast && (
-        <div className={`fixed bottom-8 right-8 px-6 py-3 rounded-lg shadow-lg z-50 text-white text-sm font-medium transition-all duration-300 ${toastIsError ? 'bg-red-500' : 'bg-gray-800'
-          }`}>
+        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', padding: '12px 24px', borderRadius: '0.5rem', boxShadow: '0 4px 20px rgba(0,0,0,0.25)', zIndex: 50, color: '#fff', fontSize: '0.875rem', fontWeight: 500, background: toastIsError ? '#ef4444' : '#1e1e2e', border: toastIsError ? 'none' : '1px solid #3a3a4a' }}>
           {toastMessage}
         </div>
       )}

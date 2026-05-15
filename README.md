@@ -461,7 +461,7 @@ GestureMate/
 │   ├── sign-recognition.js         # Sign recognition + voice-to-text page
 │   ├── learning.js                 # Learning module
 │   ├── game.js                     # Gamified practice module
-│   ├── custom-training.js          # Custom sign training utility
+│   ├── game-hub.js                 # Gaming module front page
 │   └── api/                        # Next.js API routes (proxy to Flask + DB)
 │       ├── status.js               # Proxy → Flask /status
 │       ├── reset.js                # Proxy → Flask /reset

@@ -12,7 +12,7 @@ const HeaderSection = () => {
 
   return (
     <div style={{
-      background: '#FEF0E6',
+      background: 'var(--hero-bg)',
       borderRadius: 24,
       display: 'flex',
       alignItems: 'stretch',
@@ -20,6 +20,7 @@ const HeaderSection = () => {
       paddingLeft: 48,
       overflow: 'hidden',
       height: 300,
+      border: '1px solid var(--card-border)',
     }}>
 
       {/* ── LEFT: Text content ── */}
@@ -44,7 +45,7 @@ const HeaderSection = () => {
         <h1 style={{
           fontSize: 54,
           fontWeight: 800,
-          color: '#111214',
+          color: 'var(--foreground)',
           fontFamily: 'Inter, sans-serif',
           lineHeight: 1.05,
           margin: '0 0 14px',
@@ -54,7 +55,7 @@ const HeaderSection = () => {
 
         <p style={{
           fontSize: 14.5,
-          color: '#666',
+          color: 'var(--muted-text)',
           fontFamily: 'Inter, sans-serif',
           lineHeight: 1.65,
           margin: '0 0 30px',
@@ -86,21 +87,21 @@ const HeaderSection = () => {
 
           <Link href="/learning" style={{
             background: 'transparent',
-            color: '#111214',
+            color: 'var(--foreground)',
             padding: '12px 22px',
             borderRadius: 10,
             fontWeight: 600,
             fontSize: 15,
             fontFamily: 'Inter, sans-serif',
             textDecoration: 'none',
-            border: '1.5px solid #CCC',
+            border: '1.5px solid var(--card-border)',
             display: 'inline-flex',
             alignItems: 'center',
             gap: 8,
           }}>
             Learn More
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <path d="M5 12h14M12 5l7 7-7 7" stroke="#111214" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </Link>
         </div>

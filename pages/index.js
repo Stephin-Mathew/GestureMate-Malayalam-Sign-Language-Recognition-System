@@ -16,7 +16,7 @@ export default function Home() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#fff', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: 'var(--background)', display: 'flex', flexDirection: 'column' }}>
       {/* Navigation */}
       <Navigation />
 
@@ -51,7 +51,7 @@ export default function Home() {
             description="Learn and practice through fun games designed to improve your sign language skills."
             imageSrc="/images/Gaming Module Controller.png"
             buttonText="Play Now"
-            onClick={() => router.push('/custom-training')}
+            onClick={() => router.push('/game-hub')}
           />
 
           {/* 03 - Learning Module */}

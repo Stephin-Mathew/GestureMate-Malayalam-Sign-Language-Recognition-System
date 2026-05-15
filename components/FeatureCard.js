@@ -13,13 +13,13 @@ const FeatureCard = ({
     <>
       <style>{`
         .feature-card {
-          background: #fff;
+          background: var(--card-bg);
           border-radius: 20px;
           padding: 28px 24px 24px;
           display: flex;
           flex-direction: column;
-          box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-          border: 1.5px solid transparent;
+          box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+          border: 1.5px solid var(--card-border-light);
           transition:
             box-shadow 0.28s ease,
             transform 0.28s ease,
@@ -32,7 +32,7 @@ const FeatureCard = ({
           content: '';
           position: absolute;
           inset: 0;
-          background: linear-gradient(135deg, rgba(249,115,22,0.04) 0%, transparent 60%);
+          background: linear-gradient(135deg, rgba(249,115,22,0.05) 0%, transparent 60%);
           opacity: 0;
           transition: opacity 0.28s ease;
           border-radius: 20px;
@@ -131,7 +131,7 @@ const FeatureCard = ({
         <h3 style={{
           fontSize: 18,
           fontWeight: 700,
-          color: '#111214',
+          color: 'var(--foreground)',
           fontFamily: 'Inter, sans-serif',
           marginBottom: 10,
         }}>
@@ -141,7 +141,7 @@ const FeatureCard = ({
         {/* Description */}
         <p style={{
           fontSize: 13.5,
-          color: '#666',
+          color: 'var(--muted-text)',
           fontFamily: 'Inter, sans-serif',
           lineHeight: 1.65,
           marginBottom: 24,

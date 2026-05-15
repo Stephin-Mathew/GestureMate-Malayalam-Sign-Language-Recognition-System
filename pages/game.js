@@ -218,9 +218,9 @@ function CharComparison({ typed, target, onCharClick }) {
       {targetChars.map((ch, i) => {
         const typedChar = typedChars[i];
         const hasVideo = !!CHAR_VIDEO[ch];
-        let bg = 'rgba(255,255,255,0.08)';
-        let color = 'rgba(255,255,255,0.35)';
-        let border = '1.5px solid rgba(255,255,255,0.12)';
+        let bg = '#f1f5f9';
+        let color = '#94a3b8';
+        let border = '1.5px solid #e2e8f0';
         if (typedChar !== undefined) {
           if (typedChar === ch) {
             bg = 'rgba(34,197,94,0.25)';
@@ -281,18 +281,18 @@ function SignVideoModal({ char, onClose }) {
       <div
         onClick={e => e.stopPropagation()}
         style={{
-          background: 'linear-gradient(135deg,#1a1a2e,#16213e)',
+          background: 'var(--card-bg)',
           border: '1.5px solid rgba(249,115,22,0.35)',
           borderRadius: '20px', overflow: 'hidden',
           width: 'min(380px, 92vw)',
-          boxShadow: '0 24px 60px rgba(0,0,0,0.6)',
+          boxShadow: '0 24px 60px rgba(0,0,0,0.25)',
         }}
       >
         {/* Header */}
         <div style={{
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '16px 20px',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          borderBottom: '1px solid var(--card-border)',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
@@ -303,8 +303,8 @@ function SignVideoModal({ char, onClose }) {
               flexShrink: 0,
             }}>{char}</div>
             <div>
-              <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px' }}>Sign Tutorial</p>
-              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-inter)' }}>
+              <p style={{ fontSize: '0.65rem', color: 'var(--muted-text-2)', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '2px' }}>Sign Tutorial</p>
+              <h3 style={{ fontSize: '0.95rem', fontWeight: 700, color: 'var(--foreground)', fontFamily: 'var(--font-inter)' }}>
                 {char} — {signId.replace('_', ' ').toUpperCase()}
               </h3>
             </div>
@@ -313,8 +313,8 @@ function SignVideoModal({ char, onClose }) {
             onClick={onClose}
             style={{
               width: '32px', height: '32px', borderRadius: '8px',
-              background: 'rgba(255,255,255,0.08)', border: 'none',
-              color: 'rgba(255,255,255,0.6)', fontSize: '1rem',
+              background: 'var(--subtle-bg)', border: 'none',
+              color: 'var(--muted-text)', fontSize: '1rem',
               cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}
           >✕</button>
@@ -332,7 +332,7 @@ function SignVideoModal({ char, onClose }) {
         </video>
 
         {/* Footer */}
-        <p style={{ padding: '10px 20px', fontSize: '0.7rem', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-inter)' }}>
+        <p style={{ padding: '10px 20px', fontSize: '0.7rem', color: '#94a3b8', fontFamily: 'var(--font-inter)' }}>
           File: <code style={{ color: 'rgba(249,115,22,0.7)' }}>{signId}.mp4</code>
           &nbsp;·&nbsp;Click outside to close
         </p>
@@ -759,7 +759,7 @@ export default function GamePage() {
         .game-level-card { transition: transform 0.18s ease, box-shadow 0.18s ease; }
       `}</style>
 
-      <div style={{ minHeight: '100vh', background: '#0e0e14', color: '#fff' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--background)', color: 'var(--foreground)' }}>
         <Navigation />
 
         {/* ══════════════════ LEVEL SELECT VIEW ══════════════════ */}
@@ -772,7 +772,7 @@ export default function GamePage() {
               <h1 style={{ fontSize: '2.8rem', fontWeight: 800, background: 'linear-gradient(135deg,#f97316,#a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontFamily: 'var(--font-work-sans)', marginBottom: '10px' }}>
                 Sign Language Game
               </h1>
-              <p style={{ color: 'rgba(255,255,255,0.55)', fontSize: '1.05rem', fontFamily: 'var(--font-inter)' }}>
+              <p style={{ color: 'var(--muted-text)', fontSize: '1.05rem', fontFamily: 'var(--font-inter)' }}>
                 Type Malayalam sentences using hand gestures. Progress through levels and earn XP!
               </p>
 
@@ -783,10 +783,10 @@ export default function GamePage() {
                   { label: 'Total XP', value: `${progress.totalXP} ✨`, icon: '⚡' },
                   { label: 'Completed', value: `${progress.completedLevels?.length || 0} / ${LEVELS.length}`, icon: '✅' },
                 ].map(s => (
-                  <div key={s.label} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', padding: '14px 24px', textAlign: 'center', minWidth: '130px' }}>
+                  <div key={s.label} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '14px', padding: '14px 24px', textAlign: 'center', minWidth: '130px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                     <div style={{ fontSize: '1.5rem' }}>{s.icon}</div>
                     <div style={{ fontSize: '1.35rem', fontWeight: 700, color: '#f97316' }}>{progressLoading ? '…' : s.value}</div>
-                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{s.label}</div>
+                    <div style={{ fontSize: '0.72rem', color: 'var(--muted-text-2)', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -806,11 +806,11 @@ export default function GamePage() {
                     onClick={() => unlocked && startLevel(lvl)}
                     style={{
                       background: completed
-                        ? 'linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05))'
+                        ? 'linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04))'
                         : unlocked
-                          ? 'rgba(255,255,255,0.05)'
-                          : 'rgba(255,255,255,0.025)',
-                      border: `1.5px solid ${completed ? 'rgba(34,197,94,0.4)' : unlocked ? 'rgba(255,255,255,0.12)' : 'rgba(255,255,255,0.05)'}`,
+                          ? 'var(--card-bg)'
+                          : 'var(--subtle-bg-2)',
+                      border: `1.5px solid ${completed ? 'rgba(34,197,94,0.4)' : unlocked ? 'var(--card-border)' : 'var(--card-border-light)'}`,
                       borderRadius: '18px',
                       padding: '22px',
                       cursor: unlocked ? 'pointer' : 'not-allowed',
@@ -826,12 +826,12 @@ export default function GamePage() {
                     </div>
 
                     {/* Level number */}
-                    <div style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Level</div>
-                    <div style={{ fontSize: '2.2rem', fontWeight: 800, color: unlocked ? '#f97316' : 'rgba(255,255,255,0.3)', lineHeight: 1, marginBottom: '10px' }}>{lvl.level}</div>
+                    <div style={{ fontSize: '0.72rem', color: '#94a3b8', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Level</div>
+                    <div style={{ fontSize: '2.2rem', fontWeight: 800, color: unlocked ? '#f97316' : '#cbd5e1', lineHeight: 1, marginBottom: '10px' }}>{lvl.level}</div>
 
                     {/* Sentence */}
-                    <div style={{ fontSize: '1.5rem', fontFamily: 'serif', marginBottom: '4px', color: unlocked ? '#fff' : 'rgba(255,255,255,0.3)' }}>{lvl.sentence}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-inter)', marginBottom: '14px' }}>{lvl.hint}</div>
+                    <div style={{ fontSize: '1.5rem', fontFamily: 'serif', marginBottom: '4px', color: unlocked ? 'var(--foreground)' : 'var(--muted-text-3)' }}>{lvl.sentence}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--muted-text-2)', fontFamily: 'var(--font-inter)', marginBottom: '14px' }}>{lvl.hint}</div>
 
                     {/* Difficulty badge */}
                     <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', background: diff.bg, color: diff.color, borderRadius: '999px', padding: '3px 10px', fontSize: '0.72rem', fontWeight: 600, fontFamily: 'var(--font-inter)' }}>
@@ -845,7 +845,7 @@ export default function GamePage() {
 
                     {/* Best time */}
                     {completedData && (
-                      <div style={{ marginTop: '10px', fontSize: '0.7rem', color: 'rgba(34,197,94,0.8)', fontFamily: 'var(--font-inter)' }}>
+                      <div style={{ marginTop: '10px', fontSize: '0.7rem', color: 'rgba(34,197,94,0.9)', fontFamily: 'var(--font-inter)' }}>
                         ⏱ Best: {formatTime(completedData.timeTakenSeconds)}
                       </div>
                     )}
@@ -857,8 +857,8 @@ export default function GamePage() {
             {/* Back button */}
             <div style={{ textAlign: 'center', marginTop: '48px' }}>
               <button
-                onClick={() => router.push('/custom-training')}
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', color: 'rgba(255,255,255,0.6)', padding: '10px 28px', fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'var(--font-inter)', transition: 'all 0.2s' }}
+                onClick={() => router.push('/game-hub')}
+                style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: '12px', color: 'var(--muted-text)', padding: '10px 28px', fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'var(--font-inter)', transition: 'all 0.2s' }}
               >
                 ← Back to Training
               </button>
@@ -874,7 +874,7 @@ export default function GamePage() {
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', animation: 'slide-in-up 0.4s ease' }}>
               <button
                 onClick={() => { stopTimer(); flaskReset(); setView('levels'); }}
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '10px', color: 'rgba(255,255,255,0.55)', padding: '8px 18px', fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'var(--font-inter)' }}
+                style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: '10px', color: 'var(--muted-text)', padding: '8px 18px', fontSize: '0.85rem', cursor: 'pointer', fontFamily: 'var(--font-inter)' }}
               >
                 ← Levels
               </button>
@@ -884,7 +884,7 @@ export default function GamePage() {
                   ⏱ {formatTime(elapsed)}
                 </div>
                 {/* Attempt */}
-                <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '8px 14px', fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', fontFamily: 'var(--font-inter)' }}>
+                <div style={{ background: 'var(--subtle-bg)', border: '1px solid var(--card-border)', borderRadius: '10px', padding: '8px 14px', fontSize: '0.8rem', color: 'var(--muted-text)', fontFamily: 'var(--font-inter)' }}>
                   Attempt #{attempts}
                 </div>
                 {/* Connection */}
@@ -895,14 +895,14 @@ export default function GamePage() {
             </div>
 
             {/* Question card */}
-            <div style={{ background: 'linear-gradient(135deg, rgba(249,115,22,0.15), rgba(168,85,247,0.1))', border: '1.5px solid rgba(249,115,22,0.3)', borderRadius: '20px', padding: '28px 32px', marginBottom: '24px', textAlign: 'center', animation: 'slide-in-up 0.45s ease' }}>
-              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-inter)', marginBottom: '8px' }}>
+            <div style={{ background: 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(168,85,247,0.05))', border: '1.5px solid rgba(249,115,22,0.25)', borderRadius: '20px', padding: '28px 32px', marginBottom: '24px', textAlign: 'center', animation: 'slide-in-up 0.45s ease', boxShadow: '0 2px 12px rgba(249,115,22,0.07)' }}>
+              <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#94a3b8', fontFamily: 'var(--font-inter)', marginBottom: '8px' }}>
                 Level {activeLevel.level} — {activeLevel.difficulty} · +{activeLevel.xp} XP
               </div>
-              <div style={{ fontSize: '3rem', fontFamily: 'serif', color: '#fff', marginBottom: '6px', animation: 'glow-pulse 2s ease infinite' }}>
+              <div style={{ fontSize: '3rem', fontFamily: 'serif', color: 'var(--foreground)', marginBottom: '6px', animation: 'glow-pulse 2s ease infinite' }}>
                 {activeLevel.sentence}
               </div>
-              <div style={{ fontSize: '0.9rem', color: 'rgba(255,255,255,0.45)', fontFamily: 'var(--font-inter)' }}>
+              <div style={{ fontSize: '0.9rem', color: 'var(--muted-text)', fontFamily: 'var(--font-inter)' }}>
                 {activeLevel.hint} • Type this sentence using your hand gestures
               </div>
 
@@ -918,9 +918,9 @@ export default function GamePage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '20px', animation: 'slide-in-up 0.5s ease' }}>
 
               {/* Camera feed */}
-              <div style={{ background: 'rgba(255,255,255,0.04)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: '18px', overflow: 'hidden' }}>
-                <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <span style={{ fontWeight: 600, fontSize: '0.95rem', fontFamily: 'var(--font-inter)' }}>📷 Camera Feed</span>
+              <div style={{ background: 'var(--card-bg)', border: '1.5px solid var(--card-border)', borderRadius: '18px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.07)' }}>
+                <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <span style={{ fontWeight: 600, fontSize: '0.95rem', fontFamily: 'var(--font-inter)', color: 'var(--foreground)' }}>📷 Camera Feed</span>
                 </div>
                 <div style={{ background: '#000', borderRadius: '0 0 17px 17px', overflow: 'hidden' }}>
                   <img
@@ -946,8 +946,8 @@ export default function GamePage() {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
                 {/* Recognition output */}
-                <div style={{ background: 'rgba(255,255,255,0.04)', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: '18px', padding: '20px' }}>
-                  <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-inter)', marginBottom: '14px' }}>Sign Recognition</p>
+                <div style={{ background: 'var(--card-bg)', border: '1.5px solid var(--card-border)', borderRadius: '18px', padding: '20px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+                  <p style={{ fontSize: '0.7rem', fontWeight: 600, color: 'var(--muted-text-2)', textTransform: 'uppercase', letterSpacing: '0.1em', fontFamily: 'var(--font-inter)', marginBottom: '14px' }}>Sign Recognition</p>
 
                   {/* Fast Conversation toggle */}
                   <button
@@ -959,25 +959,25 @@ export default function GamePage() {
                     style={{
                       width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                       padding: '8px 12px', borderRadius: '10px', marginBottom: '14px', border: 'none', cursor: 'pointer',
-                      background: fastMode ? 'rgba(139,92,246,0.25)' : 'rgba(255,255,255,0.06)',
+                      background: fastMode ? 'rgba(139,92,246,0.12)' : '#f8fafc',
                       transition: 'all 0.2s',
                     }}
                   >
-                    <span style={{ color: fastMode ? '#a78bfa' : 'rgba(255,255,255,0.4)', fontSize: '0.8rem', fontWeight: 600, fontFamily: 'var(--font-inter)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ color: fastMode ? '#7c3aed' : '#94a3b8', fontSize: '0.8rem', fontWeight: 600, fontFamily: 'var(--font-inter)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                       ⚡ Fast Conversation
                     </span>
-                    <span style={{ width: '32px', height: '16px', borderRadius: '999px', background: fastMode ? '#7c3aed' : 'rgba(255,255,255,0.15)', position: 'relative', display: 'inline-block', transition: 'background 0.2s' }}>
+                    <span style={{ width: '32px', height: '16px', borderRadius: '999px', background: fastMode ? '#7c3aed' : '#d1d5db', position: 'relative', display: 'inline-block', transition: 'background 0.2s' }}>
                       <span style={{ position: 'absolute', top: '2px', left: fastMode ? '16px' : '2px', width: '12px', height: '12px', borderRadius: '50%', background: '#fff', transition: 'left 0.2s', display: 'block' }} />
                     </span>
                   </button>
 
                   {/* Mode toggle */}
-                  <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '4px' }}>
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', background: '#f1f5f9', borderRadius: '12px', padding: '4px' }}>
                     {['static', 'dynamic'].map(m => (
                       <button key={m} onClick={() => setMode(m)} style={{
                         flex: 1, padding: '6px 0', borderRadius: '9px', border: 'none', cursor: 'pointer', fontSize: '0.78rem', fontWeight: 600, fontFamily: 'var(--font-inter)', transition: 'all 0.2s',
                         background: recognitionMode === m ? (m === 'dynamic' ? '#3b82f6' : '#f97316') : 'transparent',
-                        color: recognitionMode === m ? '#fff' : 'rgba(255,255,255,0.4)',
+                        color: recognitionMode === m ? '#fff' : '#64748b',
                       }}>{m === 'static' ? '🤚 Static' : '👋 Dynamic'}</button>
                     ))}
                   </div>
@@ -985,22 +985,22 @@ export default function GamePage() {
                   {/* Detected character */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '14px' }}>
                     <div style={{ textAlign: 'center' }}>
-                      <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-inter)', marginBottom: '4px' }}>Detected</p>
+                      <p style={{ fontSize: '0.7rem', color: 'var(--muted-text-2)', fontFamily: 'var(--font-inter)', marginBottom: '4px' }}>Detected</p>
                       <div style={{ fontSize: '3.8rem', fontWeight: 800, color: '#f97316', lineHeight: 1, animation: char !== '—' ? 'char-pop 0.2s ease' : 'none' }}>{char}</div>
                     </div>
                     <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-inter)', marginBottom: '6px' }}>Confidence</p>
-                      <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '999px', height: '6px', overflow: 'hidden' }}>
+                      <p style={{ fontSize: '0.7rem', color: 'var(--muted-text-2)', fontFamily: 'var(--font-inter)', marginBottom: '6px' }}>Confidence</p>
+                      <div style={{ background: 'var(--subtle-bg)', borderRadius: '999px', height: '6px', overflow: 'hidden' }}>
                         <div style={{ height: '100%', borderRadius: '999px', background: 'linear-gradient(90deg,#f97316,#a855f7)', width: `${Math.min(confidence * 100, 100)}%`, transition: 'width 0.3s ease' }} />
                       </div>
-                      <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', marginTop: '4px', fontFamily: 'var(--font-inter)' }}>{(confidence * 100).toFixed(1)}%</p>
+                      <p style={{ fontSize: '0.72rem', color: 'var(--muted-text-2)', marginTop: '4px', fontFamily: 'var(--font-inter)' }}>{(confidence * 100).toFixed(1)}%</p>
 
                       {recognitionMode === 'dynamic' && (
                         <>
-                          <p style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-inter)', marginTop: '8px', marginBottom: '4px' }}>
+                          <p style={{ fontSize: '0.7rem', color: 'var(--muted-text-2)', fontFamily: 'var(--font-inter)', marginTop: '8px', marginBottom: '4px' }}>
                             Frames <span style={{ color: '#60a5fa', fontWeight: 700 }}>{dynamicFrames}/30</span>
                           </p>
-                          <div style={{ background: 'rgba(255,255,255,0.1)', borderRadius: '999px', height: '6px', overflow: 'hidden' }}>
+                          <div style={{ background: 'var(--subtle-bg)', borderRadius: '999px', height: '6px', overflow: 'hidden' }}>
                             <div style={{ height: '100%', borderRadius: '999px', background: '#3b82f6', width: `${(dynamicFrames / 30) * 100}%`, transition: 'width 0.15s' }} />
                           </div>
                         </>
@@ -1010,10 +1010,10 @@ export default function GamePage() {
 
                   {/* Pending char (dynamic mode) */}
                   {recognitionMode === 'dynamic' && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: pendingChar ? 'rgba(59,130,246,0.1)' : 'rgba(255,255,255,0.04)', border: pendingChar ? '1px solid rgba(59,130,246,0.3)' : '1px solid rgba(255,255,255,0.06)', borderRadius: '10px', padding: '10px 12px', marginBottom: '14px', transition: 'all 0.3s' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: pendingChar ? 'rgba(59,130,246,0.08)' : '#f8fafc', border: pendingChar ? '1px solid rgba(59,130,246,0.25)' : '1px solid #e2e8f0', borderRadius: '10px', padding: '10px 12px', marginBottom: '14px', transition: 'all 0.3s' }}>
                       <div>
-                        <p style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-inter)', marginBottom: '2px' }}>Pending</p>
-                        <div style={{ fontSize: '2rem', fontWeight: 700, color: pendingChar ? '#60a5fa' : 'rgba(255,255,255,0.2)' }}>{pendingChar || '—'}</div>
+                        <p style={{ fontSize: '0.65rem', color: '#94a3b8', fontFamily: 'var(--font-inter)', marginBottom: '2px' }}>Pending</p>
+                        <div style={{ fontSize: '2rem', fontWeight: 700, color: pendingChar ? '#3b82f6' : '#cbd5e1' }}>{pendingChar || '—'}</div>
                       </div>
                       <p style={{ fontSize: '0.75rem', color: '#60a5fa', fontFamily: 'var(--font-inter)', fontStyle: 'italic' }}>
                         {pendingChar ? '"next" gesture to commit' : 'No char pending'}
@@ -1022,8 +1022,8 @@ export default function GamePage() {
                   )}
 
                   {/* Typed sentence box */}
-                  <div style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '12px', minHeight: '64px', padding: '12px', marginBottom: '12px', fontSize: '1.5rem', fontFamily: 'serif', color: '#fff', wordBreak: 'break-word', lineHeight: 1.5 }}>
-                    {sentence || <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.9rem', fontFamily: 'var(--font-inter)' }}>Your typed sentence will appear here…</span>}
+                  <div style={{ background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '12px', minHeight: '64px', padding: '12px', marginBottom: '12px', fontSize: '1.5rem', fontFamily: 'serif', color: 'var(--foreground)', wordBreak: 'break-word', lineHeight: 1.5 }}>
+                    {sentence || <span style={{ color: 'var(--muted-text-3)', fontSize: '0.9rem', fontFamily: 'var(--font-inter)' }}>Your typed sentence will appear here…</span>}
                   </div>
 
                   {/* Action buttons */}
@@ -1031,17 +1031,17 @@ export default function GamePage() {
                     <button onClick={handleReset} style={{ flex: 1, background: '#f97316', color: '#fff', border: 'none', borderRadius: '10px', padding: '9px 0', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-glory)', transition: 'background 0.2s' }}>
                       ↺ Reset
                     </button>
-                    <button onClick={handleBackspace} disabled={!sentence} style={{ flex: 1, background: 'rgba(255,255,255,0.08)', color: sentence ? '#fff' : 'rgba(255,255,255,0.2)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '10px', padding: '9px 0', fontSize: '0.82rem', fontWeight: 700, cursor: sentence ? 'pointer' : 'not-allowed', fontFamily: 'var(--font-glory)', transition: 'all 0.2s' }}>
+                    <button onClick={handleBackspace} disabled={!sentence} style={{ flex: 1, background: sentence ? 'var(--subtle-bg)' : 'var(--subtle-bg-2)', color: sentence ? 'var(--foreground)' : 'var(--muted-text-3)', border: '1px solid var(--card-border)', borderRadius: '10px', padding: '9px 0', fontSize: '0.82rem', fontWeight: 700, cursor: sentence ? 'pointer' : 'not-allowed', fontFamily: 'var(--font-glory)', transition: 'all 0.2s' }}>
                       ⌫ Backspace
                     </button>
                   </div>
                 </div>
 
                 {/* Progress towards answer */}
-                <div style={{ background: 'rgba(255,255,255,0.04)', border: '1.5px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '16px 18px' }}>
-                  <p style={{ fontSize: '0.72rem', color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px' }}>Progress</p>
+                <div style={{ background: 'var(--card-bg)', border: '1.5px solid var(--card-border)', borderRadius: '14px', padding: '16px 18px', boxShadow: '0 1px 4px rgba(0,0,0,0.05)' }}>
+                  <p style={{ fontSize: '0.72rem', color: 'var(--muted-text-2)', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '10px' }}>Progress</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <div style={{ flex: 1, background: 'rgba(255,255,255,0.08)', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
+                    <div style={{ flex: 1, background: 'var(--subtle-bg)', borderRadius: '999px', height: '8px', overflow: 'hidden' }}>
                       <div style={{
                         height: '100%',
                         borderRadius: '999px',
@@ -1050,7 +1050,7 @@ export default function GamePage() {
                         transition: 'width 0.3s ease',
                       }} />
                     </div>
-                    <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)', fontFamily: 'var(--font-inter)', fontWeight: 600, minWidth: '40px', textAlign: 'right' }}>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--muted-text)', fontFamily: 'var(--font-inter)', fontWeight: 600, minWidth: '40px', textAlign: 'right' }}>
                       {activeLevel ? `${[...sentence].length}/${[...activeLevel.sentence].length}` : '0/0'}
                     </span>
                   </div>
@@ -1072,7 +1072,7 @@ export default function GamePage() {
               <h1 style={{ fontSize: '2.8rem', fontWeight: 800, background: 'linear-gradient(135deg,#f97316,#a855f7)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', fontFamily: 'var(--font-work-sans)', marginBottom: '8px' }}>
                 Level Complete!
               </h1>
-              <p style={{ color: 'rgba(255,255,255,0.5)', fontFamily: 'var(--font-inter)', marginBottom: '36px' }}>
+              <p style={{ color: 'var(--muted-text)', fontFamily: 'var(--font-inter)', marginBottom: '36px' }}>
                 You signed <span style={{ color: '#f97316', fontFamily: 'serif', fontSize: '1.1rem' }}>{activeLevel.sentence}</span> ({activeLevel.hint}) correctly!
               </p>
 
@@ -1083,16 +1083,16 @@ export default function GamePage() {
                   { icon: '⚡', label: 'XP Earned', value: `+${xpEarned}` },
                   { icon: '🎯', label: 'Attempts', value: `${attempts}` },
                 ].map(s => (
-                  <div key={s.label} style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '14px', padding: '18px 12px' }}>
+                  <div key={s.label} style={{ background: 'var(--card-bg)', border: '1px solid var(--card-border)', borderRadius: '14px', padding: '18px 12px', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
                     <div style={{ fontSize: '1.6rem', marginBottom: '4px' }}>{s.icon}</div>
                     <div style={{ fontSize: '1.4rem', fontWeight: 800, color: '#f97316' }}>{s.value}</div>
-                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{s.label}</div>
+                    <div style={{ fontSize: '0.7rem', color: '#94a3b8', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{s.label}</div>
                   </div>
                 ))}
               </div>
 
               {/* Total XP */}
-              <div style={{ background: 'rgba(168,85,247,0.12)', border: '1px solid rgba(168,85,247,0.25)', borderRadius: '12px', padding: '12px 20px', marginBottom: '28px', fontSize: '0.9rem', color: '#c084fc', fontFamily: 'var(--font-inter)' }}>
+              <div style={{ background: 'rgba(168,85,247,0.08)', border: '1px solid rgba(168,85,247,0.2)', borderRadius: '12px', padding: '12px 20px', marginBottom: '28px', fontSize: '0.9rem', color: '#7c3aed', fontFamily: 'var(--font-inter)' }}>
                 Total XP: <strong style={{ fontSize: '1.1rem' }}>{progress.totalXP} ✨</strong>
                 {saveStatus === 'saving' && <span style={{ marginLeft: '10px', opacity: 0.6 }}>Saving…</span>}
                 {saveStatus === 'saved' && <span style={{ marginLeft: '10px', color: '#4ade80' }}>✓ Saved</span>}
@@ -1110,13 +1110,13 @@ export default function GamePage() {
                 </button>
                 <button
                   onClick={retryLevel}
-                  style={{ background: 'rgba(255,255,255,0.07)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '14px', padding: '14px 28px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-glory)' }}
+                  style={{ background: 'var(--subtle-bg)', color: 'var(--foreground)', border: '1px solid var(--card-border)', borderRadius: '14px', padding: '14px 28px', fontSize: '1rem', fontWeight: 600, cursor: 'pointer', fontFamily: 'var(--font-glory)' }}
                 >
                   ↺ Retry
                 </button>
                 <button
                   onClick={() => setView('levels')}
-                  style={{ background: 'rgba(255,255,255,0.04)', color: 'rgba(255,255,255,0.45)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', padding: '14px 22px', fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'var(--font-inter)' }}
+                  style={{ background: 'var(--subtle-bg-2)', color: 'var(--muted-text)', border: '1px solid var(--card-border)', borderRadius: '14px', padding: '14px 22px', fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'var(--font-inter)' }}
                 >
                   All Levels
                 </button>

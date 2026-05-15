@@ -82,14 +82,14 @@ export default function AlphabetTutorial() {
 
     return (
         <>
-            <div id="alphabet-tutorial" className="bg-white rounded-3xl p-8 relative overflow-hidden shadow-lg mt-8">
+            <div id="alphabet-tutorial" style={{ background: 'var(--card-bg)', borderRadius: '1.5rem', padding: '2rem', position: 'relative', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.08)', marginTop: '2rem', border: '1px solid var(--card-border)' }}>
                 <div className="absolute -top-8 -right-8 w-[600px] h-[200px] bg-brand-orange rounded-full opacity-10 pointer-events-none"></div>
 
                 <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-brand-dark" style={{ fontFamily: 'var(--font-work-sans)' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--brand-dark)', fontFamily: 'var(--font-work-sans)' }}>
                         Malayalam Sign Language Tutorial
                     </h2>
-                    <p className="text-gray-500 mt-1" style={{ fontFamily: 'var(--font-inter)' }}>
+                    <p style={{ color: 'var(--muted-text)', marginTop: '4px', fontFamily: 'var(--font-inter)' }}>
                         Click any letter to watch the corresponding sign language video.
                     </p>
                 </div>

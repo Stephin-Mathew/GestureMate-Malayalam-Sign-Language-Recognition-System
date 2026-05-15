@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import { UserButton, useUser } from '@clerk/nextjs';
+import { useTheme } from '../context/ThemeContext';
 
 const Navigation = () => {
   const router = useRouter();
   const { isSignedIn } = useUser();
+  const { darkMode, toggleDarkMode } = useTheme();
 
   const [visible, setVisible] = useState(true);
   const [scrolled, setScrolled] = useState(false);
@@ -31,14 +33,14 @@ const Navigation = () => {
   const navItems = [
     { name: 'Home', href: '/' },
     { name: 'Sign Recognition', href: '/sign-recognition' },
-    { name: 'Game', href: '/custom-training' },
+    { name: 'Game', href: '/game-hub' },
     { name: 'Learning', href: '/learning' },
   ];
 
   const isActive = (href) => {
     if (href === '/') return router.pathname === '/';
     return router.pathname.startsWith(href) ||
-      (href === '/custom-training' && router.pathname === '/game');
+      (href === '/game-hub' && router.pathname === '/game');
   };
 
   return (
@@ -68,16 +70,16 @@ const Navigation = () => {
           padding: 0 6px 0 12px;
           height: 72px;
           border-radius: 18px;
-          background: rgba(255, 255, 255, 0.82);
+          background: var(--nav-bg);
           backdrop-filter: blur(20px);
           -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.9);
+          border: 1px solid var(--nav-border);
           box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
           transition: box-shadow 0.3s ease, background 0.3s ease;
         }
         .nav-bar.scrolled {
-          background: rgba(255,255,255,0.92);
-          box-shadow: 0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+          background: var(--nav-bg-scrolled);
+          box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.07);
         }
 
         /* ── Logo ── */
@@ -100,7 +102,7 @@ const Navigation = () => {
           display: flex;
           align-items: center;
           gap: 2px;
-          background: #F5F5F5;
+          background: var(--nav-links-bg);
           border-radius: 12px;
           padding: 4px;
         }
@@ -112,7 +114,7 @@ const Navigation = () => {
           font-size: 14px;
           font-weight: 500;
           font-family: 'Inter', sans-serif;
-          color: #555;
+          color: var(--muted-text);
           text-decoration: none;
           white-space: nowrap;
           transition: color 0.18s ease, background 0.18s ease;
@@ -120,10 +122,10 @@ const Navigation = () => {
         }
         .nav-link:hover {
           color: #F97316;
-          background: rgba(249,115,22,0.06);
+          background: rgba(249,115,22,0.08);
         }
         .nav-link.active {
-          background: #fff;
+          background: var(--nav-link-active-bg);
           color: #F97316;
           font-weight: 600;
           box-shadow: 0 1px 6px rgba(0,0,0,0.08), 0 0 0 1px rgba(249,115,22,0.15);
@@ -137,40 +139,52 @@ const Navigation = () => {
           flex-shrink: 0;
         }
 
-        /* Bell */
-        .nav-bell-wrap {
-          position: relative;
-        }
-        .nav-bell {
-          width: 38px;
+        /* ── Theme Toggle ── */
+        .nav-theme-toggle {
+          width: 70px;
           height: 38px;
-          border-radius: 11px;
-          background: #F5F5F5;
-          border: 1px solid #EBEBEB;
+          border-radius: 19px;
+          border: 1.5px solid var(--card-border);
+          background: var(--subtle-bg);
           display: flex;
           align-items: center;
-          justify-content: center;
+          padding: 3px;
           cursor: pointer;
-          transition: background 0.18s, border-color 0.18s;
+          position: relative;
+          transition: background 0.3s ease, border-color 0.3s ease;
+          flex-shrink: 0;
         }
-        .nav-bell:hover {
-          background: #FFEEDE;
-          border-color: rgba(249,115,22,0.3);
+        .nav-theme-toggle:hover {
+          border-color: rgba(249,115,22,0.4);
+          background: var(--nav-links-bg);
         }
-        .nav-badge {
-          position: absolute;
-          top: -4px; right: -4px;
-          width: 18px; height: 18px;
-          background: #EF4444;
+        .nav-theme-knob {
+          width: 30px;
+          height: 30px;
           border-radius: 50%;
-          border: 2px solid #fff;
+          background: #fff;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.18);
           display: flex;
           align-items: center;
           justify-content: center;
-          font-size: 8px;
-          font-weight: 700;
-          color: #fff;
-          font-family: 'Inter', sans-serif;
+          transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1), background 0.3s ease;
+          position: absolute;
+          left: 3px;
+          font-size: 14px;
+          line-height: 1;
+        }
+        .nav-theme-knob.dark {
+          transform: translateX(32px);
+          background: #1e1e2e;
+        }
+        .nav-theme-track-icons {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          width: 100%;
+          padding: 0 6px 0 8px;
+          pointer-events: none;
+          font-size: 12px;
         }
 
         /* Login */
@@ -201,7 +215,7 @@ const Navigation = () => {
           height: 38px;
           border-radius: 11px;
           overflow: hidden;
-          border: 1px solid #EBEBEB;
+          border: 1px solid var(--card-border);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -232,18 +246,26 @@ const Navigation = () => {
           {/* Right actions */}
           <div className="nav-actions">
 
-            {/* Notification bell */}
-            <div className="nav-bell-wrap">
-              <div className="nav-bell">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6V11c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z" fill="#555"/>
-                </svg>
+            {/* Dark / Light mode toggle */}
+            <button
+              className="nav-theme-toggle"
+              onClick={toggleDarkMode}
+              title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {/* Track icons (faint, always visible) */}
+              <div className="nav-theme-track-icons">
+                <span style={{ opacity: darkMode ? 0.3 : 1, transition: 'opacity 0.3s', fontSize: 13 }}>☀️</span>
+                <span style={{ opacity: darkMode ? 1 : 0.3, transition: 'opacity 0.3s', fontSize: 13 }}>🌙</span>
               </div>
-              <div className="nav-badge">8+</div>
-            </div>
+              {/* Sliding knob */}
+              <span className={`nav-theme-knob${darkMode ? ' dark' : ''}`}>
+                {darkMode ? '🌙' : '☀️'}
+              </span>
+            </button>
 
             {/* Divider */}
-            <div style={{ width: 1, height: 26, background: '#E8E8E8', margin: '0 2px' }} />
+            <div style={{ width: 1, height: 26, background: 'var(--divider)', margin: '0 2px' }} />
 
             {/* Auth */}
             {isSignedIn ? (

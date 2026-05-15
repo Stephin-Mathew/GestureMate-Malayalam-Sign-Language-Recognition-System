@@ -75,7 +75,7 @@ export default function CustomTraining() {
 
   return (
     <>
-      <Head><title>Game Page – GestureMate</title></Head>
+      <Head><title>Sign Challenge – GestureMate</title></Head>
 
       <style>{`
         @keyframes float-char {
@@ -115,11 +115,12 @@ export default function CustomTraining() {
         .feature-card:hover {
           transform: translateY(-4px);
           border-color: rgba(249,115,22,0.35) !important;
-          background: rgba(249,115,22,0.06) !important;
+          background: rgba(249,115,22,0.04) !important;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.08);
         }
       `}</style>
 
-      <div style={{ minHeight: '100vh', background: '#0e0e14', color: '#fff' }}>
+      <div style={{ minHeight: '100vh', background: 'var(--background)', color: 'var(--foreground)' }}>
         <Navigation />
 
         <main style={{ maxWidth: '1100px', margin: '0 auto', padding: '40px 24px 80px' }}>
@@ -127,7 +128,7 @@ export default function CustomTraining() {
           {/* ── HERO SECTION ─────────────────────────────────────────── */}
           <div style={{
             position: 'relative', overflow: 'hidden',
-            background: 'linear-gradient(135deg, rgba(249,115,22,0.1) 0%, rgba(168,85,247,0.08) 50%, rgba(15,15,22,0) 100%)',
+            background: 'linear-gradient(135deg, rgba(249,115,22,0.08) 0%, rgba(168,85,247,0.05) 50%, rgba(0,0,0,0) 100%)',
             border: '1.5px solid rgba(249,115,22,0.2)',
             borderRadius: '28px',
             padding: '60px 48px',
@@ -150,14 +151,14 @@ export default function CustomTraining() {
                 fontFamily: 'var(--font-work-sans)',
                 lineHeight: 1.1,
                 marginBottom: '16px',
-                background: 'linear-gradient(135deg, #fff 30%, rgba(249,115,22,0.9) 60%, #a855f7)',
+                background: 'linear-gradient(135deg, #f97316, #a855f7)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
               }}>
-                Game Page
+                Sign Challenge
               </h1>
 
-              <p style={{ fontSize: '1.1rem', color: 'rgba(255,255,255,0.55)', maxWidth: '560px', margin: '0 auto 36px', fontFamily: 'var(--font-inter)', lineHeight: 1.6 }}>
+              <p style={{ fontSize: '1.1rem', color: '#64748b', maxWidth: '560px', margin: '0 auto 36px', fontFamily: 'var(--font-inter)', lineHeight: 1.6 }}>
                 Practice Malayalam sign language through a fast-paced gesture typing game.
                 Show signs, build sentences, and level up your skills!
               </p>
@@ -192,7 +193,7 @@ export default function CustomTraining() {
                   ].map(s => (
                     <div key={s.label} style={{ textAlign: 'center' }}>
                       <div style={{ fontSize: '1.2rem', fontWeight: 800, color: '#f97316' }}>{s.value}</div>
-                      <div style={{ fontSize: '0.68rem', color: 'rgba(255,255,255,0.35)', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{s.label}</div>
+                      <div style={{ fontSize: '0.68rem', color: '#94a3b8', fontFamily: 'var(--font-inter)', textTransform: 'uppercase', letterSpacing: '0.07em' }}>{s.label}</div>
                     </div>
                   ))}
                 </div>
@@ -236,8 +237,8 @@ export default function CustomTraining() {
                 key={f.title}
                 className="feature-card"
                 style={{
-                  background: 'rgba(255,255,255,0.035)',
-                  border: '1.5px solid rgba(255,255,255,0.08)',
+                  background: 'var(--card-bg)',
+                  border: '1.5px solid var(--card-border)',
                   borderRadius: '18px',
                   padding: '24px',
                   animation: `slide-fade-in 0.5s ease ${f.delay} both`,
@@ -246,15 +247,15 @@ export default function CustomTraining() {
                 <div style={{ width: '46px', height: '46px', borderRadius: '12px', background: `${f.color}22`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', marginBottom: '14px', border: `1.5px solid ${f.color}33` }}>
                   {f.icon}
                 </div>
-                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: '#fff', fontFamily: 'var(--font-inter)', marginBottom: '8px' }}>{f.title}</h3>
-                <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.45)', fontFamily: 'var(--font-inter)', lineHeight: 1.6 }}>{f.desc}</p>
+                <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--foreground)', fontFamily: 'var(--font-inter)', marginBottom: '8px' }}>{f.title}</h3>
+                <p style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontFamily: 'var(--font-inter)', lineHeight: 1.6 }}>{f.desc}</p>
               </div>
             ))}
           </div>
 
           {/* ── HOW TO PLAY ──────────────────────────────────────────── */}
-          <div style={{ background: 'rgba(255,255,255,0.025)', border: '1.5px solid rgba(255,255,255,0.07)', borderRadius: '20px', padding: '32px', animation: 'slide-fade-in 0.6s ease 0.5s both' }}>
-            <h2 style={{ fontSize: '1.3rem', fontWeight: 700, fontFamily: 'var(--font-work-sans)', marginBottom: '24px', color: '#fff' }}>
+          <div style={{ background: 'var(--card-bg)', border: '1.5px solid var(--card-border)', borderRadius: '20px', padding: '32px', animation: 'slide-fade-in 0.6s ease 0.5s both', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+            <h2 style={{ fontSize: '1.3rem', fontWeight: 700, fontFamily: 'var(--font-work-sans)', marginBottom: '24px', color: 'var(--foreground)' }}>
               🕹️ How to Play
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '16px' }}>
@@ -267,7 +268,7 @@ export default function CustomTraining() {
               ].map(s => (
                 <div key={s.step} style={{ display: 'flex', alignItems: 'flex-start', gap: '12px' }}>
                   <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: 'rgba(249,115,22,0.2)', border: '1.5px solid rgba(249,115,22,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem', fontWeight: 800, color: '#f97316', flexShrink: 0 }}>{s.step}</div>
-                  <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', fontFamily: 'var(--font-inter)', lineHeight: 1.5, marginTop: '4px' }}>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--muted-text)', fontFamily: 'var(--font-inter)', lineHeight: 1.5, marginTop: '4px' }}>
                     {s.icon} {s.text}
                   </p>
                 </div>
