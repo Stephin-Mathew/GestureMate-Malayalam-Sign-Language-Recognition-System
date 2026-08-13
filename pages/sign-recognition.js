@@ -43,6 +43,11 @@ export default function SignRecognition() {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const currentAudioRef = useRef(null);
 
+  // ── Gemini AI Suggestions state ───────────────────────────────────────────
+  const [wordSuggestions, setWordSuggestions] = useState([]);
+  const [isFetchingSuggestions, setIsFetchingSuggestions] = useState(false);
+  const suggestionDebounceRef = useRef(null);
+
   // ── Toast ──────────────────────────────────────────────────────────────────
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
@@ -51,6 +56,68 @@ export default function SignRecognition() {
 
   // Direct Flask URL — bypasses the Next.js /api/video-feed proxy for lower latency
   const videoFeedUrl = 'http://localhost:5000/video_feed';
+
+  // ── Gemini Suggestions Fetcher ─────────────────────────────────────────────
+  const fetchWordSuggestions = useCallback((text, currentSingleChar) => {
+    const query = (text || '').trim() || (currentSingleChar && currentSingleChar !== '—' ? currentSingleChar : '');
+    if (!query) {
+      setWordSuggestions([]);
+      return;
+    }
+
+    if (suggestionDebounceRef.current) {
+      clearTimeout(suggestionDebounceRef.current);
+    }
+
+    suggestionDebounceRef.current = setTimeout(async () => {
+      setIsFetchingSuggestions(true);
+      try {
+        const res = await fetch('/api/gemini-suggestions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, char: currentSingleChar }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setWordSuggestions(data.suggestions || []);
+        }
+      } catch (e) {
+        console.error('Error fetching word suggestions:', e);
+      } finally {
+        setIsFetchingSuggestions(false);
+      }
+    }, 350);
+  }, []);
+
+  useEffect(() => {
+    fetchWordSuggestions(sentence, char);
+  }, [sentence, char, fetchWordSuggestions]);
+
+  const handleApplySuggestion = (suggestedItem) => {
+    const suggestedWord = typeof suggestedItem === 'string' ? suggestedItem : suggestedItem.word;
+    if (!suggestedWord) return;
+
+    setSentence(prev => {
+      let nextSentence = '';
+      const trimmed = prev.trim();
+      if (!trimmed) {
+        nextSentence = suggestedWord;
+      } else {
+        const words = trimmed.split(/\s+/);
+        const lastWord = words[words.length - 1];
+        if (suggestedWord.startsWith(lastWord)) {
+          words[words.length - 1] = suggestedWord;
+          nextSentence = words.join(' ');
+        } else {
+          nextSentence = trimmed + ' ' + suggestedWord;
+        }
+      }
+      syncToFlask(nextSentence);
+      return nextSentence;
+    });
+
+    displayToast(`Added "${suggestedWord}" ✨`);
+  };
 
   // ── Init ───────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -587,6 +654,66 @@ export default function SignRecognition() {
                 style={{ fontSize: '1.25rem', background: 'var(--input-bg)', border: '1px solid var(--card-border)', borderRadius: '0.75rem', minHeight: '72px', padding: '0.75rem', color: 'var(--foreground)', marginBottom: '0.75rem', wordBreak: 'break-words', fontFamily: 'var(--font-inter)' }}
               >
                 {sentence || <span style={{ color: 'var(--muted-text-3)' }}>Sentence will appear here…</span>}
+              </div>
+
+              {/* ── Gemini AI Suggestions Section ────────────────────── */}
+              <div
+                className="mb-3 p-3 rounded-xl border transition-all duration-200"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.05) 0%, rgba(59, 130, 246, 0.05) 100%)',
+                  borderColor: 'rgba(147, 51, 234, 0.2)',
+                  boxShadow: '0 2px 8px rgba(147, 51, 234, 0.04)',
+                }}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-sm">✨</span>
+                    <span className="text-xs font-semibold text-purple-700 dark:text-purple-300 uppercase tracking-wider" style={{ fontFamily: 'var(--font-inter)' }}>
+                      Gemini AI Word Suggestions
+                    </span>
+                  </div>
+                  {isFetchingSuggestions && (
+                    <span className="text-[10px] text-purple-500 animate-pulse font-medium">
+                      Thinking…
+                    </span>
+                  )}
+                </div>
+
+                {wordSuggestions.length > 0 ? (
+                  <div className="flex flex-wrap gap-1.5">
+                    {wordSuggestions.map((item, idx) => {
+                      const wordText = typeof item === 'string' ? item : item.word;
+                      const meaningText = typeof item === 'object' ? item.meaning : null;
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => handleApplySuggestion(item)}
+                          className="group relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-white dark:bg-gray-800 border border-purple-200 dark:border-purple-800 text-gray-800 dark:text-gray-100 hover:border-purple-500 hover:bg-purple-50 dark:hover:bg-purple-950/40 hover:text-purple-700 dark:hover:text-purple-300 transition-all duration-150 shadow-sm active:scale-95 cursor-pointer"
+                          title={meaningText ? `Meaning: ${meaningText}` : `Click to add ${wordText}`}
+                          style={{ fontFamily: 'var(--font-inter)' }}
+                        >
+                          <span className="font-bold text-sm text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">
+                            {wordText}
+                          </span>
+                          {meaningText && (
+                            <span className="text-[10px] text-gray-400 dark:text-gray-400 font-normal">
+                              ({meaningText})
+                            </span>
+                          )}
+                          <span className="text-[10px] text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                            +
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-gray-400 italic" style={{ fontFamily: 'var(--font-inter)' }}>
+                    {sentence || (char && char !== '—')
+                      ? (isFetchingSuggestions ? 'Fetching smart completions...' : 'No suggestions available yet.')
+                      : 'Perform a sign or type to see Gemini word completions here...'}
+                  </p>
+                )}
               </div>
 
               {/* Sign action buttons */}
